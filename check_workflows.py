@@ -813,6 +813,69 @@ with sync_playwright() as pw:
             # Keep the empty-review wording on the screen by deciding the other groups too.
             p.locator('[data-select-section="multi"]').click();p.locator('[data-action="bulk-olsd"]').click();save_button(p).click();p.locator('[data-select-section="labs"]').click();p.locator('[data-action="bulk-olsd"]').click();save_button(p).click()
             check('32 tests need approval.' in p.locator('.empty').inner_text(),'5: all-caught-up text counts tests rather than changes')
+    if ONLY in [None,'a-mismatch-positions']:
+        for index in [0,2,4]:
+            with case('a-mismatch-positions') as p:
+                ids=['demo-tsh','demo-crp','sample-10','sample-20','sample-30']
+                for id in ids:p.locator(f'[data-inline="{id}|name|epic"]').click()
+                save_button(p).click();p.get_by_role('button',name='Go to approvals',exact=True).click();p.locator('[data-action="select-all-approvals"]').click();p.locator('[data-action="approve-all"]').click();click_download(p,f'tested-a-mismatch-{index}.xlsx')
+                rows=p.evaluate('state.exports[0].tests.map(t=>({id:t.id,name:t.title,value:t.proposed.name}))');bad=rows[index]['id'];good=[t['id'] for t in rows if t['id']!=bad]
+                p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click()
+                if index==0:
+                    p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":partial"]').click()
+                else:
+                    updates={t['id']:{'name':t['value'] if t['id']!=bad else f'Observed mismatch at position {index}'} for t in rows}
+                    p.evaluate('(updates)=>{applySnapshot(updates);refreshWorking();render();}',updates)
+                check(p.evaluate('(ids)=>ids.every(id=>confirmed(byId(id))&&!toReview(byId(id)))',good),f'A1: four matching tests become Done with mismatch at position {index}')
+                check(p.evaluate('(id)=>toReview(byId(id))&&!confirmed(byId(id))',bad),f'A1: only the differing test returns to review at position {index}')
+                check(p.evaluate('(ids)=>ids.every(id=>pendingKeys(byId(id)).length===0&&approved(byId(id)))',good),'A1: matching tests retain approval and have no false open changes')
+                row=p.locator('.download-record')
+                check(row.locator('.file-confirmed').count()==4 and row.locator('.outdated-file').count()==0,'A1: comparison reports matched rows as Done without retiring the file')
+                check(f"{rows[index]['name']} differs from this file. Review it in To review." in row.inner_text(),'A1: the mismatch is named with the requested review instruction')
+                check('Do not import' not in row.inner_text() and p.locator('.download-warning').count()==0,'A1: a comparison result does not show a manual-retirement warning')
+                p.reload()
+                check(p.evaluate('(ids)=>ids.every(id=>confirmed(byId(id))&&!toReview(byId(id)))',good) and p.locator('.outdated-file').count()==0,'A1: matching rows and comparison-only status survive reload')
+                # A later correct observation can resolve the same comparison without inventing new choices.
+                p.evaluate('(updates)=>{applySnapshot(updates);refreshWorking();render();}',{t['id']:{'name':t['value']} for t in rows})
+                check(p.evaluate('(ids)=>ids.every(id=>confirmed(byId(id))&&!toReview(byId(id)))',ids),'A1: a later fully matching observation confirms all rows')
+    if ONLY in [None,'a-unchanged-mismatch']:
+        with case('a-unchanged-mismatch') as p:
+            ids=['demo-tsh','demo-crp']
+            for id in ids:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to approvals',exact=True).click();p.locator('[data-action="select-all-approvals"]').click();p.locator('[data-action="approve-all"]').click();click_download(p,'tested-a-unchanged-mismatch.xlsx')
+            p.evaluate("applySnapshot({'demo-tsh':{name:byId('demo-tsh').olsd.name},'demo-crp':{name:byId('demo-crp').proposed.name}});refreshWorking();render();")
+            check(p.evaluate("toReview(byId('demo-tsh'))&&confirmed(byId('demo-crp'))&&!toReview(byId('demo-crp'))"),'A1: an observed value unchanged from the old snapshot still returns to review when it differs from the file')
+    if ONLY in [None,'a-person-retirement']:
+        for withdraw in [False,True]:
+            with case('a-person-retirement') as p:
+                open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-a-retired.xlsx')
+                if withdraw:p.locator('[data-withdraw="demo-tsh"]').click()
+                else:p.locator('[data-change-choice="name"]').click();choose(p,'name','olsd');save_button(p).click()
+                p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":match"]').click()
+                check(p.locator('.outdated-file').is_visible() and 'Out of date. Do not import.' in p.locator('.download-record').inner_text(),'A1: a person’s '+('withdrawal' if withdraw else 'changed choice')+' keeps the file retired even if a later observation matches it')
+                check(p.evaluate("toReview(byId('demo-tsh'))&&!confirmed(byId('demo-tsh'))"),'A1: a retired import does not silently reinstate the person’s approval')
+    if ONLY in [None,'a-download-wording']:
+        with case('a-download-wording') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-a-normal.xlsx');p.locator('[data-nav="downloads"]').click()
+            text=p.locator('.download-record').inner_text()
+            check('Nothing has reached OLSD yet.' in text and 'for the unconfirmed tests' not in text,'A2: a normal one-test download uses the short wording')
+        with case('a-download-wording') as p:
+            for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to approvals',exact=True).click();p.locator('[data-action="select-all-approvals"]').click();p.locator('[data-action="approve-all"]').click();click_download(p,'tested-a-partial.xlsx')
+            p.locator('[data-nav="downloads"]').click();check('for the unconfirmed tests' not in p.locator('.download-record').inner_text(),'A2: an entirely unconfirmed multi-test file also uses the short wording')
+            p.evaluate("applySnapshot({'demo-tsh':{name:byId('demo-tsh').proposed.name}});refreshWorking();render();")
+            check('Nothing has reached OLSD yet for the unconfirmed tests: C-Reactive Protein.' in p.locator('.download-record').inner_text(),'A2: a partially confirmed file names the tests the longer wording applies to')
+            check(p.locator('.file-confirmed').count()==1 and p.locator('.comparison-mismatch').count()==0,'A2: a test not supplied in a partial observation remains unconfirmed without an invented mismatch')
+    if ONLY in [None,'a-recover-comparison-cascade']:
+        with case('a-recover-comparison-cascade') as p:
+            ids=['demo-tsh','demo-crp','sample-10','sample-20','sample-30']
+            for id in ids:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to approvals',exact=True).click();p.locator('[data-action="select-all-approvals"]').click();p.locator('[data-action="approve-all"]').click();click_download(p,'tested-a-legacy-cascade.xlsx')
+            p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":partial"]').click()
+            p.evaluate("const x=state.exports[0];delete x.comparisonReviews;x.invalidations=[];for(const row of x.tests){const t=byId(row.id);t.approval.outdated=true;t.pending.name={source:'OLSD',before:row.olsd.name,after:t.olsd.name,at:x.check.at,previous:row.decisions.name};delete t.decisions.name;x.invalidations.push({id:t.id,at:new Date(Date.now()+1000).toISOString(),reason:'OLSD changed after this file was downloaded.'});}persist();")
+            p.reload()
+            check(p.evaluate("['demo-crp','sample-10','sample-20','sample-30'].every(id=>confirmed(byId(id))&&!toReview(byId(id)))"),'A1: older saved comparison cascades recover the four matching tests without resetting data')
+            check(p.evaluate("toReview(byId('demo-tsh'))") and p.locator('.outdated-file').count()==0,'A1: recovery keeps the actual mismatch in review without a false retirement warning')
     if ONLY in [None,'e1-1-unsaved-notes']:
         for first in [None,'olsd']:
             with case('e1-1-unsaved-notes') as p:
