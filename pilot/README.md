@@ -42,3 +42,5 @@ The root prototype’s browser storage is never read or migrated. No real source
 Follow [DEPLOYMENT.md](DEPLOYMENT.md). Deploy development first, run the read-only comparisons, validate vendor import behavior, and then permit the supervised pilot export/import cycle. Deployment scripts select only application code, dependencies, and assets; tests, local data, and credentials are excluded.
 
 Deferred features remain concurrent editors, automatic OLSD website collection, and hash/identifier round-trip verification in the vendor catalog. Internal file hashes already protect artifact integrity, but they are not injected into OLSD.
+
+One Epic procedure may feed multiple OLSD entries. Source normalization expands distinct OLSD links and retains each link label; approvals and wording choices stay per OLSD ID. The shared Epic name is source context, and does not automatically replace specimen-specific OLSD names.

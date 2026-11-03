@@ -25,7 +25,7 @@ The function must return a data frame with these exact columns:
 - `Procedure Display Name`: proposed name.
 - `Authorized Lab Sections`: semicolon-separated section identifiers used by the shared mappings.
 
-Alias your warehouse result columns to these names. Keep the actual query in the institutional repository or a provisioned file. Records with no OLSD link are excluded and retained for inspection; duplicate identities or multiple OLSD links fail validation. If your warehouse cannot provide that link, implement and validate an explicit identity crosswalk rather than matching by test name.
+Alias your warehouse result columns to these names. Keep the actual query in the institutional repository or a provisioned file. Records with no OLSD link are excluded and retained for inspection. One procedure may link to multiple OLSD entries: each distinct OLSD ID becomes its own review record, retaining its link label. Repeated links to the same entry are deduplicated. Different procedures claiming the same OLSD ID still fail validation. If your warehouse cannot provide that link, implement and validate an explicit identity crosswalk rather than matching by test name.
 
 Leave `OLSD_HELIX_PIN` unset/empty for direct warehouse access; a nonempty value takes precedence over the adapter. Existing `HELIX` names are configuration labels and do not require the database to be Helix. Put your query in `pilot/sql/warehouse_catalog.sql`. The adapter reads that path relative to the project root; no SQL-path environment variable is needed.
 
