@@ -1,20 +1,21 @@
 {
-  "verified_at": "2026-11-03T21:32:29.933066+00:00",
-  "source_commit": "f0a79a83a1cfd789ad1fef1b7d24843489a6c5ee",
+  "verified_at": "2026-11-03T23:06:00.335708+00:00",
+  "source_commit": "7483a5da60574b4a747f7f542792b4f803476dc8",
   "prototype_baseline": "6f0443b",
   "r": {
-    "at": "2026-11-03T21:31:45Z",
-    "tests": 18,
-    "passed": 107,
+    "at": "2026-11-03T23:05:21Z",
+    "tests": 22,
+    "passed": 122,
     "failed": 0,
     "errors": 0
   },
   "browser": {
-    "passed": 15,
+    "passed": 16,
     "checks": [
       "OLSD upload preview and explicit acceptance",
       "Two tests appear once each after source and mapping application",
       "A second browser session cannot write shared state",
+      "Shared procedure context and link label are shown without replacing the OLSD name",
       "An undecided test cannot be approved",
       "Save records the decision and note without approval",
       "Preparing does not record a download",
@@ -35,7 +36,8 @@
     "shiny": "generated with strict renv.lock dependency resolution",
     "scheduled_source_job": "generated with strict renv.lock dependency resolution",
     "dependency_count": 78,
-    "limitation": "CRAN index was unavailable during manifest generation; clean dependency restoration must be validated on institutional Connect."
+    "limitation": "CRAN index was unavailable during manifest generation; clean dependency restoration must be validated on institutional Connect.",
+    "scope": "Prior manifest-generation check; this change adds no dependencies."
   },
   "institutional_validation": {
     "connect_deployment": "not performed: no server configuration or credentials available",
@@ -45,44 +47,32 @@
     "prototype_parity": "Original 498 checks retained unchanged; this report covers the separate R/Shiny pilot tests, not a rerun of those browser-only prototype checks."
   },
   "sha256": {
-    "pilot/R/core.R": "5f6fa56ca1f81fda6649ee2c366ed09ab2152c904b14963f434918dbced1d5a1",
+    "pilot/R/core.R": "eec70c91b51fb68f6d7df9f89bd6d50f18e5b5e81aee7540eacf6c5194a6e6ca",
     "pilot/R/exports.R": "bdff8e6a5a3d2f1890429337967dfa57e73589f217774df50f126211954e465a",
     "pilot/R/migration.R": "eefbc02f29f4f95d9d892aa8b6e46f5098014d2cb7349d002922b6553722ab2f",
-    "pilot/R/sources.R": "9fbdb092848f75299751486de4d99af5731687eedd1b8e964fadb52ceafe7690",
+    "pilot/R/sources.R": "bbe241a13b2db5c2b404dcd1b460d716a1c251d5802a79b2cc547533914d212a",
     "pilot/R/storage.R": "e04e5ef5ef27364ac30c9b1b3b8008be683f0ec08b7b1500e339b6457ce81ded",
-    "pilot/app.R": "b77c7eaa3db1adee5dc723ffa49dc9a9fb03d487469087237e87791b46bb9bc4",
-    "pilot/jobs/helix_direct.R": "54d0a14a9114a744b39c73109d302237ab768da23efbe8ef852d70df565cfc51",
+    "pilot/app.R": "200ca2f9fb6a321a8b3def34f0cea7e6c8b712b4a53bdce125627fc44bc95d0e",
+    "pilot/jobs/helix_direct.R": "b341a431e0156aec45cd442743e98ceb11546e5833a70d903fbedfba546fe326",
     "pilot/jobs/refresh_epic.R": "4bbcff64349b6c766a95a3be9abd5cdf4aa196270b440200a165c17567bc2670",
     "pilot/renv.lock": "20c88dd6f83de7fb1d15fcfd5dce68ae44046b2c3b757e7eba7b9a456f9f7d35",
     "pilot/scripts/backup.R": "04b37f681e6a77c5bdf0ac99c74b19d0a0271a55e9b6bb20eddc8a5fb7ee7f1c",
-    "pilot/scripts/deploy.R": "3d12b2d5b98a6d164953747e9ba0c1f2890296c5cb5ee2739b53b86d256b3c7b",
+    "pilot/scripts/deploy.R": "17554d926023195b8d3491bd89ae80ce8c8eca26b9edf7f4612ae064b841e187",
     "pilot/scripts/import_candidate.R": "aaf5f23cd03b08426b557e8e9bc8938138a77eebdab4c032c61e55c2dfa5cc94",
     "pilot/scripts/migrate_preview.R": "bcbab2c76ec13cb8375a504b2256e138b42776cb8ed68128dcffb79d1920bb5d",
     "pilot/scripts/preflight.R": "acaac456be10788074110ed3b0f2ac6a22cacdd2867a718a0818f96a33a9a2f5",
     "pilot/scripts/restore.R": "20bb0a421745a3710dd0c5becb0b7380a3813ee6bf628b6e006b812d9ea706a2",
     "pilot/source_job.R": "2d9fa6f79e95af8f7a11fbe4f37286e435b6c1e585c8261e9c40f5ad39ce870d",
-    "pilot/tests/browser.py": "bab0f5c278c5afb7dd34b9388543fa7e6ee0e75e3d559cfa900b96c34a521001",
+    "pilot/tests/browser.py": "f2a45ed7962557391a42217ff16714c014951fac99c0b4930a8f237f7d16ff1e",
     "pilot/tests/run.R": "90bbfa3cfcf1321e706ff1d7f6db44f584be980e6c2e1565d92645cb214b3858",
     "pilot/tests/run_browser.py": "c339102514640f70a36f034010baa4cc332455ef680a20ff99df24c806375891",
-    "pilot/tests/seed_browser.R": "8ee3b70c1362d43e978e37af2cf5757d553124d7b95a6c6977964f3bfce862f2",
+    "pilot/tests/seed_browser.R": "55c6479d8ab58cef227c64ef47fae2fda048008f7ee5b1d4e8a50d14d7c6027c",
     "pilot/tests/testthat/helper-pilot.R": "402edbce24aab25243316fb692560bc5a82ea8a4004a4a7d9d4d73f6ba7b62a7",
     "pilot/tests/testthat/test-migration.R": "48bf053b40925efb2a01820495cab2b16fea248a0cf7f6270754153af2ceb8d9",
+    "pilot/tests/testthat/test-source-links.R": "a13a74c548ec8df5aeadb9f88854a53d8c241c002a8af72c96c7fe3ab6a95e23",
     "pilot/tests/testthat/test-storage.R": "6444e5c10299bf117b026c579d859fba6a05e961d7812547a56094c24e604b36",
     "pilot/tests/testthat/test-workflow.R": "85b9f4781605260b79b4a11ade70c4c268bfa736f978c2af5ec3d6c97b0f1622",
     "pilot/www/pilot.css": "3aada3d2d38a566242ed1bb6679c2a63ea88310ff41ce206b9f6bd66cf9d525d",
     "pilot/www/pilot.js": "712b24b766a8c97ac2df72acb3096f3b8828524fd50087449778c67d9f0cb960"
-  },
-  "maintenance_validation": {
-    "change": "Read the warehouse query from sql/warehouse_catalog.sql; include that file in direct-adapter deployments.",
-    "checks": [
-      "Modified R files parse",
-      "Missing-query error identifies the fixed SQL path",
-      "git diff --check"
-    ],
-    "scope": "Targeted check only; full-suite results above refer to source_commit.",
-    "sha256": {
-      "pilot/jobs/helix_direct.R": "b341a431e0156aec45cd442743e98ceb11546e5833a70d903fbedfba546fe326",
-      "pilot/scripts/deploy.R": "17554d926023195b8d3491bd89ae80ce8c8eca26b9edf7f4612ae064b841e187"
-    }
   }
 }
