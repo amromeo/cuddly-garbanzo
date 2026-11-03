@@ -1,4 +1,4 @@
-# OLSD workflow demo — revision 10
+# OLSD workflow demo — revision 11
 
 Static prototype with 308 sample tests. Open `index.html` or the website preview. No live Epic, OLSD, Connect, Helix, or pin connections.
 
@@ -7,7 +7,7 @@ Static prototype with 308 sample tests. Open `index.html` or the website preview
 - `app-script.js`: maintainable client source embedded in the HTML.
 - `check_workflows.py`: browser regression checks, measured click targets, and Excel readback.
 - `verification.json`: date, exact tested source commit, hashes, check results, and test-script link.
-- `REVIEW_CHANGES.md`: changes requested against commit 138948c.
+- `REVIEW_CHANGES.md`: changes requested against commit e1f02f2.
 
 The existing storage key, `olsd-workflow-prototype-v7-test-by-test-20261103`, is retained. This update preserves previously saved browser work. Reset, role, and demo-check controls remain available on desktop and phone.
 
@@ -38,10 +38,14 @@ See verification.json for the current full-suite result and measured click targe
 
 Decide later during Change restores the Epic difference and puts the proposed value back to OLSD. Save places the test under Set aside and withdraws any previous approval. Existing broken deferrals from older browser data are recovered without resetting saved work. Authored fields without an Epic difference have no deferral action. Saved partial work names the fields still waiting before approval.
 
-New workbook names include a UTC timestamp and unique download ID. Saving a changed choice/content or withdrawing approval retires prior files containing the test: Out of date. Do not import. Retired files lose their import prompt and Download again action. Other approved tests in a mixed file return to To download for a clean replacement. Old payloads and filenames remain immutable history; a file already saved or imported cannot be retracted. Later snapshots of rejected/withdrawn imports return the test to review.
+New workbook names use the same local time as the screen (America/New_York), with a short numeric suffix only on collision. The unique long ID remains internal; existing historical filenames are retained. Saving a changed choice/content or withdrawing approval retires unconfirmed updates in prior files containing the test: Out of date. Do not import. Retired files lose their import prompt and Download again action. Already-confirmed rows keep their Done date permanently; in a mixed file, only unconfirmed rows are retired or returned for a clean replacement. Other unconfirmed approved tests in a mixed file return to To download for a clean replacement. Old payloads and filenames remain immutable history; a file already saved or imported cannot be retracted. Later snapshots of rejected/withdrawn imports return the test to review.
 
-A changed choice or wording clears its previous note. Earlier note is shown for deliberate reuse, History retains the old reason, and approvals capture only current notes.
+A changed saved choice or wording clears only an inherited saved note; it does not clear a freshly typed draft note. Notes typed since the last Save stay in the draft through card selection and wording correction. Earlier saved notes are shown separately for deliberate reuse, History retains old reasons, and approvals capture current notes.
 
 Posit Connect remains the intended production deployment target. Shared persistent storage, authentication, real OLSD/Epic data, and scheduled jobs remain production work; this browser prototype does not provide those services.
 
-Release validation: 379 browser checks passed, with no JavaScript errors. The 2-click save, 5-click single-download, and 7-click 32-name paths remain unchanged.
+See verification.json for the current full-suite result and measured click paths.
+
+Decide later also retains the earlier saved value separately from the reset proposal. Decide now shows that choice accurately and offers different custom wording without replacing it with OLSD text. When Epic and OLSD match, their identical cards are merged. Confirmation receipts are stored per test/file and remain separate from later snapshot comparisons.
+
+Release validation: 415 browser checks passed, with no JavaScript errors. The measured save/single-download/32-name paths remain 2/5/7 clicks.

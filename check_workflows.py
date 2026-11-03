@@ -737,7 +737,7 @@ with sync_playwright() as pw:
         with case('retire-2-download-lifecycle') as p:
             open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-retired-single.xlsx');old=p.evaluate('state.exports[0].id')
             p.locator('[data-change-choice="name"]').click()
-            check("Don't import it. If it was already imported, a later catalog check will return this test to review." in p.locator('.download-warning').inner_text(),'2: Change after download shows the earlier-file warning')
+            check("don't import it. If it was already imported, a later catalog check will return this test to review." in p.locator('.download-warning').inner_text(),'2: Change after download shows the earlier-file warning')
             p.locator('[data-cancel-choice="name"]').click()
             check(not p.evaluate('fileOutdated(state.exports[0])'),'2: Cancel without saving keeps the approved file valid')
             p.locator('[data-change-choice="name"]').click();choose(p,'name','olsd');save_button(p).click()
@@ -813,9 +813,87 @@ with sync_playwright() as pw:
             # Keep the empty-review wording on the screen by deciding the other groups too.
             p.locator('[data-select-section="multi"]').click();p.locator('[data-action="bulk-olsd"]').click();save_button(p).click();p.locator('[data-select-section="labs"]').click();p.locator('[data-action="bulk-olsd"]').click();save_button(p).click()
             check('32 tests need approval.' in p.locator('.empty').inner_text(),'5: all-caught-up text counts tests rather than changes')
+    if ONLY in [None,'e1-1-unsaved-notes']:
+        for first in [None,'olsd']:
+            with case('e1-1-unsaved-notes') as p:
+                open_test(p,'785258')
+                if first:choose(p,'labs',first)
+                p.locator('[data-toggle-note="labs"]').click();p.locator('#note-labs').fill('A new note typed before choosing Epic');choose(p,'labs','epic')
+                check(p.locator('#note-labs').input_value()=='A new note typed before choosing Epic','1: a draft note survives choosing Epic '+('after an unsaved Keep' if first else 'as the first choice'))
+                check(p.locator('.earlier-note').count()==0,'1: an unsaved note is not relabeled as Earlier note')
+                save_button(p).click();approve_one(p,'785258')
+                check(p.evaluate("byId('785258').approval.decisions.labs.note")=='A new note typed before choosing Epic','1: approval includes the deliberately typed draft note')
+        with case('e1-1-unsaved-notes') as p:
+            open_test(p,'demo-tsh');p.locator('[data-write="name"]').click();p.locator('#edit-name').fill('My draft TSH wording');p.locator('[data-toggle-note="name"]').click();p.locator('#note-name').fill('Reason for this draft');p.locator('#edit-name').fill('My corrected draft TSH wording')
+            check(p.locator('#note-name').input_value()=='Reason for this draft','1: correcting unsaved wording preserves the newly typed note')
+            save_button(p).click();check(p.evaluate("byId('demo-tsh').decisions.name.note")=='Reason for this draft','1: Save retains a draft note after wording correction')
+        with case('e1-1-unsaved-notes') as p:
+            open_test(p,'785258');choose(p,'labs','olsd');p.locator('[data-toggle-note="labs"]').click();p.locator('#note-labs').fill('Saved old reason');save_button(p).click();p.locator('[data-change-choice="labs"]').click();p.locator('#note-labs').fill('New draft reason');choose(p,'labs','epic')
+            check(p.locator('#note-labs').input_value()=='New draft reason' and 'Saved old reason' in p.locator('.earlier-note').inner_text(),'1: a fresh draft reason survives while the earlier saved reason is shown separately')
+        with case('e1-1-unsaved-notes') as p:
+            open_test(p,'785258');choose(p,'labs','olsd');p.locator('[data-toggle-note="labs"]').click();p.locator('#note-labs').fill('Deliberately reused reason');save_button(p).click();p.locator('[data-change-choice="labs"]').click();p.locator('#note-labs').fill('');p.locator('#note-labs').fill('Deliberately reused reason');choose(p,'labs','epic')
+            check(p.locator('#note-labs').input_value()=='Deliberately reused reason','1: explicitly retyping an identical saved note counts as deliberate reuse')
+    if ONLY in [None,'e1-2-deferred-wording']:
+        with case('e1-2-deferred-wording') as p:
+            open_test(p,'demo-tsh');p.locator('[data-write="name"]').click();p.locator('#edit-name').fill('TSH, my careful wording');save_button(p).click();p.locator('[data-change-choice="name"]').click();choose(p,'name','defer');save_button(p).click();p.reload();p.locator('[data-set-aside="name"] [data-change-choice]').click()
+            check('Before setting this aside, you chose: TSH, my careful wording' in p.locator('.previous-choice').inner_text(),'2: Decide now accurately describes the earlier saved custom value')
+            check('TSH, my careful wording' in p.locator('[data-answer="name:saved"]').inner_text() and p.locator('#edit-name').input_value()=='TSH, my careful wording','2: both the retained-wording card and text box preserve the saved wording after reload')
+            choose(p,'name','saved');save_button(p).click()
+            check(p.evaluate("byId('demo-tsh').proposed.name==='TSH, my careful wording' && canApprove(byId('demo-tsh'))"),'2: the retained wording can be chosen and saved for approval again')
+        with case('e1-2-deferred-wording') as p:
+            open_test(p,'785258');choose(p,'labs','epic');save_button(p).click();p.locator('[data-change-choice="labs"]').click();choose(p,'labs','defer');save_button(p).click();p.locator('[data-set-aside="labs"] [data-change-choice]').click()
+            check('Hematology Laboratory KOP' in p.locator('.previous-choice').inner_text() and 'Before setting this aside' in p.locator('.previous-choice').inner_text(),'2: deferred Use Epic history shows the actual saved laboratories')
+        with case('e1-2-deferred-wording') as p:
+            open_test(p,'demo-tsh');p.locator('[data-write="name"]').click();p.locator('#edit-name').fill('Legacy careful wording');save_button(p).click();p.locator('[data-change-choice="name"]').click();choose(p,'name','defer');save_button(p).click()
+            p.evaluate("const t=byId('demo-tsh');delete t.decisions.name.deferredFrom;delete t.pending.name.deferredFrom;persist();")
+            p.reload();p.locator('[data-set-aside="name"] [data-change-choice]').click()
+            check('Legacy careful wording' in p.locator('[data-answer="name:saved"]').inner_text(),'2: older deferrals recover the saved wording from their change history')
+    if ONLY in [None,'e1-3-confirmed-files-stay-done']:
+        for change in ['wording','Epic']:
+            with case('e1-3-confirmed-files-stay-done') as p:
+                open_test(p,'785260');click_download(p,'tested-confirmed-history.xlsx');file=p.evaluate('state.exports[0].id')
+                p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":match"]').click();date=p.evaluate("fileConfirmation(state.exports[0],'785260').at");open_test(p,'785260')
+                if change=='wording':
+                    p.locator('[data-edit-field="conditions"]').click();p.locator('#edit-conditions').fill('New conditions after confirmation');save_button(p).click()
+                else:p.evaluate("applySource('Epic',{'785260':{name:'A new Epic CBC name'}});refreshWorking();render();")
+                check(p.locator('.download-warning').count()==0,'3: a '+change+' change on a done test does not warn that the confirmed file is out of date')
+                p.locator('[data-nav="downloads"]').click();row=p.locator(f'[data-export-id="{file}"]')
+                check('Done · matched the catalog' in row.inner_text() and row.locator('.outdated-file').count()==0,'3: confirmed download remains Done after a later '+change+' change')
+                check(p.evaluate("fileConfirmation(state.exports[0],'785260').at")==date,'3: the original confirmation date remains immutable')
+                row.locator('summary').filter(has_text='Comparison on').click()
+                check('matches this file' in row.inner_text() and 'matches exported value' not in row.inner_text(),'5: download comparisons use matches this file')
+                p.reload();check(p.locator(f'[data-export-id="{file}"] .file-confirmed').is_visible(),'3: confirmed history survives a reload after editing')
+        with case('e1-3-confirmed-files-stay-done') as p:
+            for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to approvals',exact=True).click();p.locator('[data-action="select-all-approvals"]').click();p.locator('[data-action="approve-all"]').click();click_download(p,'tested-partial-confirmation.xlsx');file=p.evaluate('state.exports[0].id')
+            p.evaluate("applySnapshot({'demo-tsh':{name:byId('demo-tsh').proposed.name}});refreshWorking();render();")
+            check(p.evaluate("!!fileConfirmation(state.exports[0],'demo-tsh') && !fileConfirmation(state.exports[0],'demo-crp')"),'3: confirmation can be recorded independently for tests in a shared file')
+            open_test(p,'demo-tsh');p.locator('[data-edit-field="name"]').click();p.locator('#edit-name').fill('A later TSH revision');save_button(p).click()
+            check(p.evaluate("!!fileConfirmation(state.exports[0],'demo-tsh') && ready(byId('demo-crp'))"),'3: revising a confirmed row preserves its receipt and returns unconfirmed rows for a clean file')
+            check(p.evaluate("activeInvalidations(state.exports[0]).every(v=>v.id!=='demo-tsh')"),'3: only unconfirmed tests are retired in a partially confirmed file')
+            p.locator('[data-nav="downloads"]').click();row=p.locator(f'[data-export-id="{file}"]')
+            check(row.locator('[data-confirmed-test="demo-tsh"]').is_visible() and row.locator('.outdated-file').is_visible(),'3: mixed history shows the confirmed test as Done and the remaining file as unsafe to import')
+        with case('e1-3-confirmed-files-stay-done') as p:
+            open_test(p,'785260');click_download(p,'tested-legacy-confirmation.xlsx');p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":match"]').click()
+            p.evaluate("const x=state.exports[0];delete x.confirmations;x.invalidations=[{id:'785260',at:new Date(Date.now()+1000).toISOString(),reason:'Legacy incorrect retirement'}];persist();")
+            p.reload()
+            check(p.locator('.file-confirmed').is_visible() and p.locator('.outdated-file').count()==0,'3: older confirmed files incorrectly retired by the prior version recover their Done receipt')
+    if ONLY in [None,'e1-4-equal-cards']:
+        with case('e1-4-equal-cards') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-equal-source.xlsx');p.locator('[data-change-choice="name"]').click();choose(p,'name','olsd');save_button(p).click();p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":match"]').click();open_test(p,'demo-tsh')
+            check(p.locator('[data-answer="name:epic"]').count()==0 and 'Keep what is in the OLSD (matches Epic)' in p.locator('[data-answer="name:olsd"]').inner_text(),'4: equal Epic and OLSD values have one combined current-value card')
+            check(p.locator('[data-answer="name:saved"]').is_visible(),'4: a genuinely different saved value remains available as a separate card')
+            choose(p,'name','olsd');save_button(p).click();check(not p.evaluate("canApprove(byId('demo-tsh'))"),'4: keeping matching current content creates no unnecessary import update')
+    if ONLY in [None,'e1-5-short-filenames']:
+        with case('e1-5-short-filenames') as p:
+            names=p.evaluate("() => {const t=clone(byId('demo-tsh')),plan={id:crypto.randomUUID(),at:'2026-11-03T20:05:16.212Z',tests:[t],groups:[{fields:['name'],ids:[t.id]},{fields:['name','conditions'],ids:[t.id]}]};return [fileName(plan,0),fileName(plan,1)];}")
+            check(names==['DEMO_OLSD_TSH_2026-11-03_1505.xlsx','DEMO_OLSD_TSH_2026-11-03_1505_2.xlsx'],'5: names use screen-local time and a short number only for a collision in one plan')
+            open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-readable-name.xlsx')
+            filename=p.evaluate('state.exports[0].fileName');check(len(filename)<60 and len(p.evaluate('state.exports[0].id'))>30,'5: the long unique ID remains internal rather than in the filename')
+            p.locator('[data-change-choice="name"]').click();check("You already downloaded a file for this test. It's out of date, so don't import it." in p.locator('.download-warning').inner_text(),'5: the warning does not incorrectly claim that the earlier value differs')
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:
-    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Next fixes reviewed at 138948c: deferral, retired downloads, note provenance and approval guidance','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Browser checks cover all requested items 1–4 and the small fixes; earlier workflow regressions retained.','review_baseline':'138948c','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
+    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Next fixes reviewed at e1f02f2: draft notes, retained deferred wording, immutable confirmations and matching cards','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Browser checks cover all requested items 1–4 and the small fixes; earlier workflow regressions retained.','review_baseline':'e1f02f2','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
     (ROOT/'verification.json').write_text(json.dumps(report,indent=2))
 print(json.dumps({'case':ONLY or 'all','passed':len(checks),'click_targets':metrics,'browser_errors':errors},indent=2))
