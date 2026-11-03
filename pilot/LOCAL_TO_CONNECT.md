@@ -27,7 +27,7 @@ The function must return a data frame with these exact columns:
 
 Alias your warehouse result columns to these names. Keep the actual query in the institutional repository or a provisioned file. Records with no OLSD link are excluded and retained for inspection; duplicate identities or multiple OLSD links fail validation. If your warehouse cannot provide that link, implement and validate an explicit identity crosswalk rather than matching by test name.
 
-Leave `OLSD_HELIX_PIN` unset/empty for direct warehouse access; a nonempty value takes precedence over the adapter. Existing `HELIX` names are configuration labels and do not require the database to be Helix. If retaining SQL-file lookup, use `OLSD_HELIX_SQL` for the deployed relative path.
+Leave `OLSD_HELIX_PIN` unset/empty for direct warehouse access; a nonempty value takes precedence over the adapter. Existing `HELIX` names are configuration labels and do not require the database to be Helix. Put your query in `pilot/sql/warehouse_catalog.sql`. The adapter reads that path relative to the project root; no SQL-path environment variable is needed.
 
 The alternative CLI uploader, `scripts/deploy.R`, contains a `rocqi` dependency check for the original direct adapter. If you use that uploader, update its check for your warehouse driver. The Git/manifest route below does not invoke that script.
 
@@ -86,8 +86,8 @@ dir.create(file.path(job, "jobs"))
 stopifnot(file.copy("source_job.R", job))
 stopifnot(all(file.copy(c("jobs/refresh_epic.R", "jobs/helix_direct.R"),
                        file.path(job, "jobs"))))
-# If the adapter reads a query file, copy that specific file into the job
-# directory here, preserving the relative path used in OLSD_HELIX_SQL.
+dir.create(file.path(job, "sql"))
+stopifnot(file.copy("sql/warehouse_catalog.sql", file.path(job, "sql")))
 rsconnect::writeManifest(appDir = app, appPrimaryDoc = "app.R", appMode = "shiny")
 rsconnect::writeManifest(appDir = job, appPrimaryDoc = "source_job.R", appMode = "r")
 ```
@@ -111,7 +111,7 @@ Local environment variables are not carried into a Git deployment. Configure the
 
 **Both items:** `OLSD_BACKEND=connect`, `CONNECT_SERVER`, `CONNECT_API_KEY`, and the same environment-specific `OLSD_EPIC_PIN`. Use the institutional approved secret mechanism. Service identities must have the relevant pin access; the database credentials and the Connect API key serve different purposes.
 
-**Source job only:** your warehouse variables, optional `OLSD_HELIX_SQL`, and an empty/unset `OLSD_HELIX_PIN`. The job needs warehouse network access, installed drivers/DSNs, warehouse permissions, and source/status pin write access. Run it once manually and inspect the published rows and status before scheduling it nightly (for example, 5:00 AM America/New_York).
+**Source job only:** your warehouse credential variables and an empty/unset `OLSD_HELIX_PIN`. The job needs warehouse network access, installed drivers/DSNs, warehouse permissions, and source/status pin write access. Run it once manually and inspect the published rows and status before scheduling it nightly (for example, 5:00 AM America/New_York).
 
 **App only:** a new `OLSD_STATE_PIN`, `OLSD_WRITER_USER`, `OLSD_ADMIN_USERS`, and initially `OLSD_INITIALIZE=true`. The app needs source pin read access and state/snapshot/export pin read/write access. It does not need warehouse credentials when reading the job's source pin.
 

@@ -71,5 +71,18 @@
     "pilot/tests/testthat/test-workflow.R": "85b9f4781605260b79b4a11ade70c4c268bfa736f978c2af5ec3d6c97b0f1622",
     "pilot/www/pilot.css": "3aada3d2d38a566242ed1bb6679c2a63ea88310ff41ce206b9f6bd66cf9d525d",
     "pilot/www/pilot.js": "712b24b766a8c97ac2df72acb3096f3b8828524fd50087449778c67d9f0cb960"
+  },
+  "maintenance_validation": {
+    "change": "Read the warehouse query from sql/warehouse_catalog.sql; include that file in direct-adapter deployments.",
+    "checks": [
+      "Modified R files parse",
+      "Missing-query error identifies the fixed SQL path",
+      "git diff --check"
+    ],
+    "scope": "Targeted check only; full-suite results above refer to source_commit.",
+    "sha256": {
+      "pilot/jobs/helix_direct.R": "b341a431e0156aec45cd442743e98ceb11546e5833a70d903fbedfba546fe326",
+      "pilot/scripts/deploy.R": "17554d926023195b8d3491bd89ae80ce8c8eca26b9edf7f4612ae064b841e187"
+    }
   }
 }

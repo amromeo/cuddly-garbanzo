@@ -26,7 +26,7 @@ Set these in Connect's environment settings, not an uploaded `.Renviron`:
 | `OLSD_SINGLE_PROCESS_CONFIRMED=true` | Set only after an administrator verifies the topology above. Otherwise writes are disabled. |
 | `OLSD_INITIALIZE=true` | Bootstrap an empty new state pin only. Turn off after the first durable save or candidate import. Missing state then becomes an error. |
 | `OLSD_HELIX_PIN` | Source job: existing institution-provided raw Helix report pin. |
-| `OLSD_HELIX_SQL` | Alternative source job input: institution-provided SQL file path. Used only when no upstream pin is configured. |
+| Query file | For direct warehouse access, include `sql/warehouse_catalog.sql` in the source-job bundle. No SQL-path environment variable is needed. |
 
 The app identity needs read access to the source pin and read/write access to its state, uploaded snapshots, and exported artifact pins. The nightly job identity needs upstream read access and source/status pin write access; it does not need editorial state write access. Do not share development and pilot write credentials unnecessarily.
 
