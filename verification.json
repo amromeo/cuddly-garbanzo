@@ -1,9 +1,9 @@
 {
-  "verified_at": "2026-11-03T17:34:40.734843+00:00",
-  "review": "Next fixes reviewed at e89992d: saved choices, test walks, worklist and phone controls",
-  "commit": "c2b46d2391f7cd358579fc0178567a384ab0622c",
+  "verified_at": "2026-11-03T18:44:22.003319+00:00",
+  "review": "Next fixes reviewed at 32260a9: consolidated saved changes, confirmation, cancel and source wording",
+  "commit": "9a6eb5ed5ef4828b10284bdc64edef0260d28f38",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 302,
+  "passed": 336,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
@@ -13,10 +13,10 @@
   "storage_key": "olsd-workflow-prototype-v7-test-by-test-20261103",
   "sample_count": 308,
   "patch_baseline": "96184ae",
-  "requested_checklist_status": "Every item in sections 1 and 2 has browser checks; prior section 6 regressions retained.",
-  "review_baseline": "e89992d",
-  "source_sha256": "30c43dd8f836a548f4dda8838b270b772c9e0e4225158095936a395bbf8d6e32",
-  "test_script_sha256": "18d0b8516cf43e1a5f9b08ce082a867c87496c4e07feb3ba61c15ee7594c3300",
+  "requested_checklist_status": "Browser checks cover all requested items 1\u20135 and the walk, carry and wording changes; previous workflow regressions retained.",
+  "review_baseline": "32260a9",
+  "source_sha256": "b3ba25f660f5076fda55072ec2e2286305fa7708c5e1ebbbf0da537de396d8ea",
+  "test_script_sha256": "3439f282c0eb118145f0a859045d6c8dc9507878b126d98ef6730a02959ed028",
   "checks": [
     {
       "case": "five-click-flow",
@@ -1145,7 +1145,12 @@
     },
     {
       "case": "multi-defer-remaining",
-      "description": "Review now reopens the remaining field and preserves the earlier choice",
+      "description": "Decide now reopens the remaining field and preserves the earlier choice",
+      "passed": true
+    },
+    {
+      "case": "multi-defer-remaining",
+      "description": "Deciding the remaining field returns the set-aside update to approval",
       "passed": true
     },
     {
@@ -1285,12 +1290,12 @@
     },
     {
       "case": "next-1-change-saved-choice",
-      "description": "1: saved update offers Send back to review on the test page",
+      "description": "1: saved update has no overlapping Send back action on the test page",
       "passed": true
     },
     {
       "case": "next-1-change-saved-choice",
-      "description": "1: test-page Send back reopens the saved update",
+      "description": "1: approval-list Send back reopens the saved update",
       "passed": true
     },
     {
@@ -1524,11 +1529,176 @@
       "passed": true
     },
     {
-      "case": "next-8-16-worklist-and-small-fixes",
+      "case": "once-1-consolidated-changes",
+      "description": "1: one saved section shows Ready for approval",
+      "passed": true
+    },
+    {
+      "case": "once-1-consolidated-changes",
+      "description": "1: saved lab change appears once and is omitted from Other fields",
+      "passed": true
+    },
+    {
+      "case": "once-1-consolidated-changes",
+      "description": "1: single saved row compares OLSD now with After import",
+      "passed": true
+    },
+    {
+      "case": "once-1-consolidated-changes",
+      "description": "1: unconfirmed saved row has one Change action and no Edit or Send back",
+      "passed": true
+    },
+    {
+      "case": "once-1-consolidated-changes",
+      "description": "1: approval updates the heading without repeating the change",
+      "passed": true
+    },
+    {
+      "case": "once-1-consolidated-changes",
+      "description": "1: lower section is named Other fields",
+      "passed": true
+    },
+    {
+      "case": "once-1-consolidated-changes",
+      "description": "1: saved and set-aside fields are each listed once",
+      "passed": true
+    },
+    {
+      "case": "once-1-consolidated-changes",
+      "description": "1: Other fields excludes both saved and set-aside fields",
+      "passed": true
+    },
+    {
+      "case": "once-2-confirmed-status",
+      "description": "2: confirmed test explicitly shows confirmation and its date",
+      "passed": true
+    },
+    {
+      "case": "once-2-confirmed-status",
+      "description": "2: confirmed field has no Change button",
+      "passed": true
+    },
+    {
+      "case": "once-2-confirmed-status",
+      "description": "2: confirmed import is not mislabeled Kept",
+      "passed": true
+    },
+    {
+      "case": "once-2-confirmed-status",
+      "description": "2: Edit starts a new saved change requiring approval",
+      "passed": true
+    },
+    {
+      "case": "once-3-cancel-change",
+      "description": "3: open Change cards replace the saved row instead of duplicating it",
+      "passed": true
+    },
+    {
+      "case": "once-3-cancel-change",
+      "description": "3: reopened change uses the short field heading",
+      "passed": true
+    },
+    {
+      "case": "once-3-cancel-change",
+      "description": "3: Cancel closes cards and discards only the unsaved replacement choice",
+      "passed": true
+    },
+    {
+      "case": "once-3-cancel-change",
+      "description": "3: leaving the test closes the reopened cards",
+      "passed": true
+    },
+    {
+      "case": "once-3-cancel-change",
+      "description": "3: cancelling one field preserves another field\u2019s unsaved choice",
+      "passed": true
+    },
+    {
+      "case": "once-3-cancel-change",
+      "description": "3: preserved unsaved choice can still be saved for approval",
+      "passed": true
+    },
+    {
+      "case": "once-4-no-duplicate-epic-card",
+      "description": "4: sent-back Epic wording retains normal inline Epic and Keep buttons",
+      "passed": true
+    },
+    {
+      "case": "once-4-no-duplicate-epic-card",
+      "description": "4: wording equal to Epic does not create a duplicate third card",
+      "passed": true
+    },
+    {
+      "case": "once-5-preserve-wording-after-source-change",
+      "description": "5: catalog change offers saved wording after a fresh reload",
+      "passed": true
+    },
+    {
+      "case": "once-5-preserve-wording-after-source-change",
+      "description": "5: catalog-only change describes the saved choice without claiming Epic changed",
+      "passed": true
+    },
+    {
+      "case": "once-5-preserve-wording-after-source-change",
+      "description": "5: retained wording remains a separate saved update for approval",
+      "passed": true
+    },
+    {
+      "case": "once-5-preserve-wording-after-source-change",
+      "description": "5: a real Epic change still shows the earlier and current Epic values",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "6: Save and finish has no overlapping Save and exit action",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "6: walk completion reports skipped tests needing a decision",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "7: opening the sole unsaved test carries the choice without saving or a dialog",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "7: carried choice remains selected in the test editor",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "7: opening a test still warns when other tests have unsaved choices",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "8: editors see a plain lab-management note instead of a dead-end Edit",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "8: administrators can open Lab mappings from the field",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "8: set-aside fields offer Decide now without a duplicate Review now action",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
+      "description": "8: a Set aside row says Set aside only once",
+      "passed": true
+    },
+    {
+      "case": "once-6-8-walk-carry-and-wording",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/c2b46d2391f7cd358579fc0178567a384ab0622c",
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/9a6eb5ed5ef4828b10284bdc64edef0260d28f38",
   "commit_scope": "Tested application, browser checks, and reviewer documents; verification metadata committed separately."
 }
