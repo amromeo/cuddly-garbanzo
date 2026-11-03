@@ -47,7 +47,7 @@ with sync_playwright() as pw:
             check(p.evaluate("byId('demo-tsh').decisions.name.choice")=='epic','Save persists the explicit choice')
             check(p.evaluate("byId('demo-tsh').approval===null"),'Saving never approves')
             p.get_by_role('button',name='Go to To approve',exact=True).click();clicks+=1
-            p.locator('[data-action="approve-all"]').click();clicks+=1
+            p.locator('[data-approve="demo-tsh"]').click();clicks+=1
             check(p.evaluate("approved(byId('demo-tsh'))"),'Approval is a separate deliberate click')
             check(p.locator('[role="dialog"]').count()==0,'Approval does not add a redundant confirmation dialog')
             wb=click_download(p,'tested-v6-single.xlsx');clicks+=1
@@ -57,8 +57,8 @@ with sync_playwright() as pw:
             metrics['single_change_to_download_clicks']=clicks
             check('Next, import this file into OLSD.' in p.locator('.import-next').inner_text(),'After download the real next step is stated')
             check(p.evaluate("state.exports.length")==1,'One file is recorded only after the download action')
-    if ONLY in [None,'six-click-bulk']:
-        with case('six-click-bulk') as p:
+    if ONLY in [None,'seven-click-bulk']:
+        with case('seven-click-bulk') as p:
             clicks=0
             p.locator('[data-select-section="name"]').click();clicks+=1
             check(p.evaluate('ui.selected.size')==32,'Select all includes the whole 32-name section, not just rendered rows')
@@ -69,11 +69,12 @@ with sync_playwright() as pw:
             save_button(p).click();clicks+=1
             check(p.evaluate('state.tests.filter(canApprove).length')==32,'Save creates 32 updates waiting for their own approval')
             p.get_by_role('button',name='Go to To approve',exact=True).click();clicks+=1
+            p.locator('[data-action="select-all-approvals"]').click();clicks+=1
             check(p.locator('[data-action="approve-all"]').inner_text()=='Approve all 32','Approval page states the exact batch count')
             p.locator('[data-action="approve-all"]').click();clicks+=1
             wb=click_download(p,'tested-v6-32-names.xlsx');clicks+=1
             check(len(list(wb['Tests'].values))==33,'One named workbook contains all 32 accepted names and the header')
-            check(clicks==6,'32 name changes reach a file in exactly six clicks')
+            check(clicks==7,'32 name changes reach a file in seven clicks including explicit approval selection')
             metrics['32_name_changes_to_download_clicks']=clicks
             check(p.evaluate('state.exports[0].tests.length')==32,'Downloaded batch records precisely the approved 32 tests')
     if ONLY in [None,'two-click-keep-undo']:
@@ -115,8 +116,8 @@ with sync_playwright() as pw:
     if ONLY in [None,'save-next-and-shortcuts']:
         with case('save-next-and-shortcuts') as p:
             open_test(p,'785258');choose(p,'labs','epic')
-            check(save_button(p).inner_text()=='Save and next','Another waiting test makes Save and next the primary action')
-            save_button(p).click()
+            check(save_button(p).inner_text()=='Save' and p.locator('[data-action="save-next"]').is_visible(),'Save stays primary and Save and next is available separately')
+            p.locator('[data-action="save-next"]').click()
             check(p.locator('h1').inner_text()=='Thyroid Stimulating Hormone','Save and next moves to the next waiting test')
             check(p.evaluate("byId('785258').approval===null && byId('785258').decisions.labs.choice==='epic'"),'Moving next saves the prior choice without approving it')
             p.keyboard.press('1')
@@ -176,8 +177,9 @@ with sync_playwright() as pw:
             check(p.evaluate("statusLabel(byId('785260'))")=='','Up-to-date tests have no unnecessary status label')
     if ONLY in [None,'multiple-files-one-click']:
         with case('multiple-files-one-click') as p:
-            p.locator('[data-inline="demo-crp|name|epic"]').click();save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click();p.locator('[data-action="approve-all"]').click()
+            p.locator('[data-inline="demo-crp|name|epic"]').click();save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click();p.locator('[data-approve="demo-crp"]').click()
             p.locator('[data-tab="download"]').click()
+            p.locator('[data-action="select-all-downloads"]').click()
             check(p.locator('[data-download-ids]').inner_text()=='Download 2 files','Different catalog updates clearly name the number of Excel files')
             check('different parts of the catalog' in p.locator('main').inner_text(),'Separate Excel files have a plain-language explanation')
             downloads=[];p.on('download',lambda d:downloads.append(d))
@@ -190,7 +192,7 @@ with sync_playwright() as pw:
                 check(openpyxl.load_workbook(ROOT/f'tested-v6-multi-{i}.xlsx').sheetnames==['Tests'],'Each separately downloaded file is valid Excel')
     if ONLY in [None,'snapshot-staleness']:
         with case('snapshot-staleness') as p:
-            p.locator('[data-inline="demo-tsh|name|epic"]').click();save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click();p.locator('[data-action="approve-all"]').click()
+            p.locator('[data-inline="demo-tsh|name|epic"]').click();save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click();p.locator('[data-approve="demo-tsh"]').click()
             basis=p.evaluate("JSON.stringify(byId('demo-tsh').approval.basis)")
             p.evaluate("applySource('Epic',{'demo-tsh':{name:'Another Epic TSH name'}});render();")
             check(p.evaluate("needsReview(byId('demo-tsh')) && !ready(byId('demo-tsh'))"),'Unexpected Epic changes return approved work to To review')
@@ -282,6 +284,97 @@ with sync_playwright() as pw:
             p.keyboard.press('Control+s')
             check(p.evaluate("!byId('demo-tsh').decisions.name && dirtyNow()"),'An empty required name cannot be saved into an unreachable approval state')
             check('before saving' in p.locator('#toast').inner_text(),'Invalid save explains what to enter without a disabled primary button')
+    if ONLY in [None,'bulk-keep-and-later']:
+        with case('bulk-keep-and-later') as p:
+            p.locator('[data-select-section="name"]').click()
+            check(p.locator('[data-action="bulk-olsd"]').inner_text()=='Keep what is in the OLSD','Bulk keep uses the requested OLSD wording')
+            check(p.locator('[data-action="bulk-defer"]').is_visible(),'Bulk selection offers Decide later alongside Epic and Keep')
+            p.locator('[data-action="bulk-olsd"]').click()
+            check(p.evaluate("unsavedIds().length===32 && !byId('demo-tsh').decisions.name"),'Bulk keep stages every selected choice without saving')
+            save_button(p).click()
+            check(p.evaluate("state.tests.filter(t=>t.decisions.name?.choice==='olsd').length")==32,'Save records all 32 deliberate keeps')
+            check(p.evaluate('state.tests.filter(canApprove).length')==0,'Bulk keeps that change nothing require no approval')
+        with case('bulk-keep-and-later') as p:
+            p.locator('[data-select-section="labs"]').click();p.locator('[data-action="bulk-defer"]').click()
+            check(p.evaluate("unsavedIds().length===11 && !byId('785258').decisions.labs"),'Bulk Decide later remains unsaved until Save')
+            check('Decide later' in p.locator('[data-row="785258|labs"]').inner_text(),'Unsaved rows identify the chosen bulk outcome')
+            save_button(p).click()
+            check(p.evaluate('stageCounts().review')==32,'Saved bulk deferral removes all 11 lab changes from To review')
+            check(p.evaluate('state.tests.filter(deferred).length')==12,'Bulk deferred tests remain findable with the existing set-aside record')
+            check(p.evaluate('state.tests.filter(canApprove).length')==0,'Deferring a batch never approves it')
+    if ONLY in [None,'save-stay-next-exit']:
+        with case('save-stay-next-exit') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic')
+            check(p.locator('[data-action="save"]').is_visible() and p.locator('[data-action="save-next"]').is_visible() and p.locator('[data-action="save-exit"]').is_visible(),'Review page offers Save, Save and next, and Save and exit separately')
+            url=p.url;p.locator('[data-action="save"]').click()
+            check(p.url==url and p.locator('h1').inner_text()=='Thyroid Stimulating Hormone','Save stays on the same test')
+            check(p.evaluate("byId('demo-tsh').decisions.name.choice==='epic' && byId('demo-tsh').approval===null"),'Save persists the choice without approving it')
+            open_test(p,'demo-crp');choose(p,'name','epic');p.locator('[data-action="save-exit"]').click()
+            check(p.locator('h1').inner_text()=='Catalog worklist','Save and exit returns to the worklist')
+            check(p.evaluate("byId('demo-crp').decisions.name.choice==='epic' && !dirtyNow()"),'Save and exit preserves the choice and clears only unsaved work')
+        with case('save-stay-next-exit') as p:
+            open_test(p,'demo-tsh');p.locator('[data-write="name"]').click();p.locator('#edit-name').fill('');url=p.url
+            p.locator('[data-action="save-exit"]').click()
+            check(p.url==url and p.evaluate('dirtyNow()'),'Failed validation cannot exit the editor without saving')
+            check('before saving' in p.locator('#toast').inner_text(),'Save and exit explains an invalid value instead of navigating away')
+            p.get_by_role('link',name='OLSD Catalog manager',exact=True).click();p.get_by_role('dialog').get_by_role('button',name='Save and continue',exact=True).click()
+            check(p.url==url and p.evaluate('dirtyNow()'),'Invalid Save and continue also stays in the editor')
+    if ONLY in [None,'previous-and-home']:
+        with case('previous-and-home') as p:
+            open_test(p,'785258')
+            check(p.get_by_role('button',name='Previous test',exact=True).is_disabled(),'First test shows a clear unavailable Previous control')
+            choose(p,'labs','epic');p.locator('[data-action="save-next"]').click()
+            check(p.get_by_role('button',name='Previous test',exact=True).is_enabled(),'Previous remains available after the prior test has been saved')
+            p.get_by_role('button',name='Previous test',exact=True).click()
+            check(p.locator('h1').inner_text()=='CBC, Platelet, No Differential','Previous returns to the saved test, not only undecided tests')
+            p.get_by_role('button',name='Next test',exact=True).click()
+            check(p.locator('h1').inner_text()=='Thyroid Stimulating Hormone','Next returns to the same review sequence')
+            check(p.locator('[data-answer="name:olsd"] strong').inner_text().startswith('Keep what is in the OLSD'),'Individual keep card uses the requested wording')
+            choose(p,'name','epic');p.get_by_role('link',name='OLSD Catalog manager',exact=True).click()
+            check(p.get_by_role('dialog').is_visible(),'Brand navigation warns about unsaved choices')
+            p.get_by_role('button',name='Stay',exact=True).click()
+            check(p.locator('h1').inner_text()=='Thyroid Stimulating Hormone','Stay cancels brand navigation and preserves the editor')
+            check(p.locator('[data-home]').evaluate('n=>n===document.activeElement'),'Canceling home navigation restores focus to the brand link')
+            p.get_by_role('link',name='OLSD Catalog manager',exact=True).click();p.get_by_role('dialog').get_by_role('button',name='Discard',exact=True).click()
+            check(p.locator('h1').inner_text()=='Catalog worklist','Clickable brand returns to the main worklist')
+            check(p.evaluate("!byId('demo-tsh').decisions.name"),'Discard through the home link does not save a choice')
+    if ONLY in [None,'approval-selection-actions']:
+        with case('approval-selection-actions') as p:
+            for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click()
+            check(p.locator('[data-approve-select]:checked').count()==0,'Approval checkboxes start unticked')
+            check(p.locator('[data-action="approve-all"]').count()==0,'Bulk approval is unavailable until a selection is made')
+            p.locator('[data-approve-select="demo-tsh"]').check()
+            check(p.locator('[data-action="approve-all"]').inner_text()=='Approve 1 selected test','Bulk approval names only the selected subset')
+            p.locator('[data-action="approve-all"]').click()
+            check(p.evaluate("approved(byId('demo-tsh')) && byId('demo-crp').approval===null"),'Approving a subset leaves unchecked tests unapproved')
+            p.locator('[data-approve-select="demo-crp"]').check();p.locator('[data-action="send-back-selected"]').click()
+            check(p.evaluate("needsReview(byId('demo-crp')) && approved(byId('demo-tsh'))"),'Sending back a subset preserves other tests’ approvals')
+        with case('approval-selection-actions') as p:
+            for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click();p.locator('[data-action="select-all-approvals"]').click()
+            check(p.locator('[data-approve-select]:checked').count()==2,'Approval Select all checks the full list')
+            check(p.locator('[data-action="send-back-selected"]').inner_text()=='Send all 2 back to review','Selected-all action clearly says all tests will return to review')
+            p.locator('[data-action="send-back-selected"]').click()
+            check(p.evaluate("needsReview(byId('demo-tsh')) && needsReview(byId('demo-crp'))"),'Send all back returns both saved updates to review')
+    if ONLY in [None,'download-selection-actions']:
+        with case('download-selection-actions') as p:
+            for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click();p.locator('[data-action="select-all-approvals"]').click();p.locator('[data-action="approve-all"]').click();p.locator('[data-tab="download"]').click()
+            check(p.locator('[data-download-select]:checked').count()==0,'Download checkboxes start unticked')
+            check(p.locator('[data-download-ids]').count()==0,'Download does not silently include the whole list')
+            p.locator('[data-download-select="demo-tsh"]').check();click_download(p,'tested-selected-only.xlsx')
+            check(p.evaluate("state.exports.length===1 && state.exports[0].tests.length===1 && state.exports[0].tests[0].id==='demo-tsh'"),'Download contains only the selected test')
+            check(p.evaluate("ready(byId('demo-crp')) && ready(byId('785260'))"),'Unchecked tests stay approved and waiting to download')
+            p.locator('[data-download-select="demo-crp"]').check();p.locator('[data-action="withdraw-selected"]').click()
+            check(p.evaluate("byId('demo-crp').approval===null && approved(byId('785260'))"),'Withdrawing a subset preserves the unchecked approval')
+            check(p.evaluate("canApprove(byId('demo-crp'))"),'Withdrawal returns the saved choice to To approve')
+        with case('download-selection-actions') as p:
+            p.locator('[data-tab="download"]').click();p.locator('[data-action="select-all-downloads"]').click()
+            check(p.locator('[data-download-select]:checked').count()==1,'Download Select all checks every ready test')
+            check(p.locator('[data-action="withdraw-selected"]').inner_text()=='Withdraw approval for selected test','Selected-all withdrawal labels its exact scope')
+            p.locator('[data-action="withdraw-selected"]').click()
+            check(p.evaluate("byId('785260').approval===null && state.exports.length===0"),'Withdraw all removes approval without creating a download')
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:

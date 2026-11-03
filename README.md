@@ -21,3 +21,5 @@ python check_workflows.py
 ```
 
 Set `OLSD_TEST_URL` to test another server. Pass a case name, such as `python check_workflows.py five-click-flow`, for a focused check. GitHub Pages publishes the `gh-pages` branch from the repository root. There is no server or build dependency for the site.
+
+Follow-up controls: bulk Epic/OLSD/later choices; Save, Save and next, Save and exit; Previous/Next; linked app name. To approve and To download use initially empty checkboxes with Select all, and actions apply only to selected tests. Approval can be sent back to review; an existing approval can be withdrawn. This follow-up preserves the revision-6 storage key. All 172 browser checks pass.

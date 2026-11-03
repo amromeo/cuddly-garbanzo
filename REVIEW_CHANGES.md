@@ -15,4 +15,11 @@ This redesign implements “Make it obvious to use,” reviewed against baseline
 - One sample-data strip holds the role, Reset, and demo-check controls on desktop and phone. System fonts use 15px body text and at least 13px labels; mobile targets are at least 44px.
 - Shortcuts 1/2 choose and Ctrl/Cmd+S saves. The reviewer guide is a short task list.
 
-Automated checks measure the 2-click save, 5-click single download, and 6-click 32-name download paths. `verification.json` records the results, tested source commit, and code/test hashes. The new storage key is `olsd-workflow-prototype-v6-choose-save-20261102`.
+Automated checks measure the 2-click save, 5-click single download, and 7-click 32-name download paths. `verification.json` records the results, tested source commit, and code/test hashes. The new storage key is `olsd-workflow-prototype-v6-choose-save-20261102`.
+
+## Follow-up controls
+
+- Bulk review offers Use Epic, Keep what is in the OLSD, and Decide later, all staged until Save.
+- The test editor offers Save, Save and next, Save and exit, and Previous/Next navigation. The linked app name returns to the worklist with the unsaved-work guard.
+- To approve and To download start with empty checkbox selections. Select some or Select all. Approve or send selected tests back to review; download or withdraw approval for selected tests. Unchecked tests remain unchanged.
+- 172 browser checks pass. The explicit approval selection adds one click to the 32-name path (7 total). This follow-up preserves the existing revision-6 storage key and saved reviewer data.
