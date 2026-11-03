@@ -1,18 +1,21 @@
 {
-  "verified_at": "2026-11-03T15:23:26.833036+00:00",
-  "review": "Follow-up bulk choices, editor navigation/save, and selected approval/download actions",
-  "commit": "337ece1207e8d1a80ef4f1c02eeed91dbe3ea468",
+  "verified_at": "2026-11-03T16:31:01.025765+00:00",
+  "review": "One row per test; patch applied to baseline 96184ae",
+  "commit": "010b51fdaa08a785181eb0d26932a6287b892351",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 172,
+  "passed": 231,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
     "32_name_changes_to_download_clicks": 7,
     "simple_choice_to_saved_clicks": 2
   },
-  "storage_key": "olsd-workflow-prototype-v6-choose-save-20261102",
-  "source_sha256": "7dbf589036dbf5dd18d6a4a2a8c7343f125409757b40cb4871502a7817e2e67c",
-  "test_script_sha256": "113b8e5b081ac05c407c619c483cdc749fed639dea426ef063f79ecf2012e47f",
+  "storage_key": "olsd-workflow-prototype-v7-test-by-test-20261103",
+  "sample_count": 308,
+  "patch_baseline": "96184ae",
+  "requested_checklist_status": "Awaiting separate one-row-per-test instructions, including section 6; linked artifact supplies patch only.",
+  "source_sha256": "7a6f69713c3330dce5e5c963b46c4fe5e03e2b1ed12059da1af5c50346e75b77",
+  "test_script_sha256": "58e41db04d8f469457f64b348a6573419413642b2203f75c14beb3a7bf10fee3",
   "checks": [
     {
       "case": "five-click-flow",
@@ -166,7 +169,7 @@
     },
     {
       "case": "question-cards",
-      "description": "Test page asks one question at a time",
+      "description": "A single-change test shows its one question",
       "passed": true
     },
     {
@@ -416,7 +419,7 @@
     },
     {
       "case": "snapshot-staleness",
-      "description": "Multiple open changes still show one question at a time",
+      "description": "All open changes are shown together on the test page",
       "passed": true
     },
     {
@@ -621,7 +624,7 @@
     },
     {
       "case": "multiple-questions-and-validation",
-      "description": "Two open changes are still presented one question at a time",
+      "description": "Two open changes are presented together on one test",
       "passed": true
     },
     {
@@ -870,11 +873,307 @@
       "passed": true
     },
     {
-      "case": "download-selection-actions",
+      "case": "one-row-per-test",
+      "description": "Sample catalog contains 308 tests",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Worklist totals count tests, not the number of changed fields",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Multiple-change tests precede single-name and single-lab groups",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Multi-change sample demo-vitd has exactly one worklist row",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Both changed fields appear inside demo-vitd row",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Multi-change sample demo-vitd is absent from single-field groups",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Multi-change sample demo-a1c has exactly one worklist row",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Both changed fields appear inside demo-a1c row",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Multi-change sample demo-a1c is absent from single-field groups",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Single-name section excludes the two multi-change tests",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Single-lab section excludes the two multi-change tests",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Global search returns a multi-change test only once",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Opening a search result shows both outstanding fields together",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "A test checkbox selects both eligible fields on that test",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk action states both field and test counts",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Section Select all includes both changes on both tests",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Section Clear selection removes every selected field",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk choices stage two tests without approving or saving",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Staged changes remain together until Save",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "One Save records all four explicit choices",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Saving two complete tests removes exactly two from To review",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Undo restores both unresolved fields on both tests",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk olsd leaves saved decisions untouched until Save",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk olsd never creates an exportable change",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk olsd remains discoverable after Save",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk defer leaves saved decisions untouched until Save",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk defer never creates an exportable change",
+      "passed": true
+    },
+    {
+      "case": "multi-selection-and-bulk",
+      "description": "Bulk defer remains discoverable after Save",
+      "passed": true
+    },
+    {
+      "case": "multi-free-text-safety",
+      "description": "A third free-text change stays in the same test row",
+      "passed": true
+    },
+    {
+      "case": "multi-free-text-safety",
+      "description": "Free text never gains a bulk Epic acceptance action",
+      "passed": true
+    },
+    {
+      "case": "multi-free-text-safety",
+      "description": "Test selection includes only eligible name and laboratory changes",
+      "passed": true
+    },
+    {
+      "case": "multi-free-text-safety",
+      "description": "Bulk save leaves the free-text question open and approval unavailable",
+      "passed": true
+    },
+    {
+      "case": "multi-free-text-safety",
+      "description": "Remaining free-text question stays accessible for individual review",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Full walkthrough starts at the first displayed multi-change test",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Both questions show a clear initial decision count",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "First choice stays visible alongside the unresolved field",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Partial choice identifies the remaining review work",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Save and next is withheld while another field needs a choice",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Partial Save stays on the test and keeps it in To review",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Partial Save survives refresh without deciding the remaining field",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Approval becomes available only after both choices are saved",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Multi-field workbook contains the explicitly accepted Epic name",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
+      "description": "Multi-field workbook contains the explicitly accepted laboratory",
+      "passed": true
+    },
+    {
+      "case": "selected-walkthrough-order",
+      "description": "Selected walkthrough has one entry per test in displayed worklist order",
+      "passed": true
+    },
+    {
+      "case": "selected-walkthrough-order",
+      "description": "Selected walkthrough opens its first displayed test",
+      "passed": true
+    },
+    {
+      "case": "selected-walkthrough-order",
+      "description": "Save and next follows the selected sequence after both decisions",
+      "passed": true
+    },
+    {
+      "case": "selected-walkthrough-order",
+      "description": "Previous revisits a completed test in the selected sequence",
+      "passed": true
+    },
+    {
+      "case": "selected-walkthrough-order",
+      "description": "Walkthrough never modifies an unselected test",
+      "passed": true
+    },
+    {
+      "case": "multi-defer-remaining",
+      "description": "Decide later preserves a chosen field and defers only the unanswered field",
+      "passed": true
+    },
+    {
+      "case": "multi-defer-remaining",
+      "description": "Deferring remaining questions is unsaved until Save",
+      "passed": true
+    },
+    {
+      "case": "multi-defer-remaining",
+      "description": "Saving remaining deferral sets the test aside without approval",
+      "passed": true
+    },
+    {
+      "case": "multi-defer-remaining",
+      "description": "Review now reopens the remaining field and preserves the earlier choice",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Shortcut 1 decides only the first unanswered field",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Shortcut 2 moves to the next unanswered field",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Keyboard decisions keep both fields visible before Save",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Multi-change worklist fits a phone without horizontal scrolling",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Test selection retains keyboard focus",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Both multi-change questions fit on a phone",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Phone keeps Save and Save and exit available for multi-change tests",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/337ece1207e8d1a80ef4f1c02eeed91dbe3ea468",
-  "commit_scope": "Tested application, browser checks, and reviewer documentation; verification metadata committed separately."
+  "commit_scope": "Locally tested source, browser checks, and reviewer documentation; verification metadata committed separately.",
+  "publication_status": "Not published; awaiting separate section 6 checklist.",
+  "patch_artifact": "https://claude.ai/public/artifacts/370408b0-b24f-4927-9ee5-f575303a6bfc"
 }
