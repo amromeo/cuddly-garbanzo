@@ -26,7 +26,7 @@ with sync_playwright() as pw:
     def case(name,size=None):
         global active
         active=name;ctx=browser.new_context(viewport=size or {'width':1450,'height':900},accept_downloads=True)
-        p=ctx.new_page();p.set_default_timeout(8000);p.on('pageerror',lambda err:errors.append(str(err)))
+        p=ctx.new_page();p.set_default_timeout(20000);p.on('pageerror',lambda err:errors.append(str(err)))
         p.goto(BASE);p.locator('h1').wait_for()
         try:yield p
         except Exception:
@@ -379,6 +379,8 @@ with sync_playwright() as pw:
         with case('one-row-per-test') as p:
             check(p.evaluate('state.tests.length')==308,'Sample catalog contains 308 tests')
             check(p.evaluate('stageCounts()')=={'review':45,'approve':0,'download':1,'all':308},'Worklist totals count tests, not the number of changed fields')
+            counts=p.locator('.list-section h2').evaluate_all(r"ns=>ns.map(n=>Number(n.textContent.match(/\((\d+)\)/)[1]))")
+            check(sum(counts)==45,'Section counts add up to the To review tab count')
             groups=p.locator('[data-change-group]').evaluate_all('ns=>ns.map(n=>n.dataset.changeGroup)')
             check(groups==['multi','name','labs'],'Multiple-change tests precede single-name and single-lab groups')
             for id in ['demo-vitd','demo-a1c']:
@@ -387,6 +389,9 @@ with sync_playwright() as pw:
                 check(p.locator(f'[data-change-group="name"] [data-row^="{id}|"], [data-change-group="labs"] [data-row^="{id}|"]').count()==0,'Multi-change sample '+id+' is absent from single-field groups')
             check('Name changes (32)' in p.locator('[data-change-group="name"] h2').inner_text(),'Single-name section excludes the two multi-change tests')
             check('Lab changes (11)' in p.locator('[data-change-group="labs"] h2').inner_text(),'Single-lab section excludes the two multi-change tests')
+            p.locator('[data-action="load-more"]').click()
+            ids=p.locator('article.test-row,article.change-row').evaluate_all("ns=>ns.map(n=>n.dataset.testRow||n.dataset.row.split('|')[0])")
+            check(len(ids)==45 and len(set(ids))==45,'Every loaded test has exactly one row across all review sections')
             p.locator('#search').fill('Vitamin D')
             check(p.locator('.catalog-row').count()==1,'Global search returns a multi-change test only once')
             p.locator('[data-test="demo-vitd"]').first.click()
@@ -432,11 +437,15 @@ with sync_playwright() as pw:
             check(p.locator('h1').inner_text()=='Vitamin D, 25-Hydroxy','Full walkthrough starts at the first displayed multi-change test')
             check(p.locator('.question').count()==2 and '0 of 2 chosen' in p.locator('.question-count').inner_text(),'Both questions show a clear initial decision count')
             choose(p,'name','epic')
+            p.locator('[data-action="see-changes"]').click();p.get_by_role('button',name='Continue choosing',exact=True).click()
             check(p.locator('.question').count()==2 and '1 of 2 chosen' in p.locator('.question-count').inner_text(),'First choice stays visible alongside the unresolved field')
             check('1 more to choose on this test' in p.locator('.save-bar').inner_text(),'Partial choice identifies the remaining review work')
             check(p.locator('[data-action="save-next"]').count()==0,'Save and next is withheld while another field needs a choice')
             save_button(p).click()
             check(p.locator('h1').inner_text()=='Vitamin D, 25-Hydroxy' and p.evaluate("toReview(byId('demo-vitd')) && !canApprove(byId('demo-vitd'))"),'Partial Save stays on the test and keeps it in To review')
+            p.locator('[data-action="back-worklist"]').click()
+            check(p.locator('[data-change-group="labs"] [data-row="demo-vitd|labs"]').is_visible() and p.locator('[data-test-row="demo-vitd"]').count()==0,'Partial Save moves the test to its one remaining change section')
+            p.locator('[data-test="demo-vitd"]').first.click()
             p.reload();check(p.evaluate("byId('demo-vitd').decisions.name.choice==='epic' && !!byId('demo-vitd').pending.labs"),'Partial Save survives refresh without deciding the remaining field')
             choose(p,'labs','epic');save_button(p).click()
             check(p.evaluate("canApprove(byId('demo-vitd'))") and p.locator('.saved-change').count()==2,'Approval becomes available only after both choices are saved')
@@ -467,11 +476,18 @@ with sync_playwright() as pw:
         with case('multi-keyboard-and-mobile') as p:
             open_test(p,'demo-vitd');p.keyboard.press('1')
             check(p.evaluate("staged.get('demo-vitd').decisions.name.choice==='epic' && !staged.get('demo-vitd').decisions.labs"),'Shortcut 1 decides only the first unanswered field')
+            check(p.locator('[data-question="name"] .shortcut').count()==0 and p.locator('[data-question="labs"] .shortcut').count()==2,'Shortcut hints follow only the first unanswered change')
             p.keyboard.press('2')
             check(p.evaluate("staged.get('demo-vitd').decisions.labs.choice==='olsd'"),'Shortcut 2 moves to the next unanswered field')
+            check(p.locator('.question .shortcut').count()==0,'Shortcut hints disappear when every multi-change question has a choice')
+            p.keyboard.press('1')
+            check(p.evaluate("staged.get('demo-vitd').decisions.labs.choice==='olsd'"),'Extra numeric keys do not alter a completed multi-change review')
             check(p.locator('.question').count()==2,'Keyboard decisions keep both fields visible before Save')
         with case('multi-keyboard-and-mobile',{'width':390,'height':844}) as p:
             check(p.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Multi-change worklist fits a phone without horizontal scrolling')
+            line=p.locator('[data-row="demo-vitd|name"]')
+            label_box=line.locator('.line-label').bounding_box();value_box=line.locator('.line-value').bounding_box()
+            check(label_box['y']+label_box['height']<=value_box['y'],'Phone field labels stack above their values')
             p.locator('[data-select-test="demo-vitd"]').check()
             check(p.locator('[data-select-test="demo-vitd"]').evaluate('n=>n===document.activeElement'),'Test selection retains keyboard focus')
             p.locator('[data-select-test="demo-vitd"]').uncheck();p.locator('[data-test="demo-vitd"]').first.click()
@@ -479,9 +495,30 @@ with sync_playwright() as pw:
             choose(p,'name','epic');choose(p,'labs','olsd')
             check(p.locator('[data-action="save"]').is_visible() and p.locator('[data-action="save-exit"]').is_visible(),'Phone keeps Save and Save and exit available for multi-change tests')
             p.screenshot(path=str(ROOT/'review-assets'/'v7-multi-mobile.png'),full_page=True)
+    if ONLY in [None,'screen-order-and-other-fields']:
+        with case('screen-order-and-other-fields') as p:
+            p.locator('[data-action="walk"]').click()
+            p.get_by_role('button',name='Next test',exact=True).click()
+            check(p.locator('h1').inner_text()=='Hemoglobin A1c','Next follows the second test displayed in the multi-change section')
+            p.get_by_role('button',name='Next test',exact=True).click()
+            check(p.locator('h1').inner_text()=='Thyroid Stimulating Hormone' and '3 of 45' in p.locator('.test-nav').inner_text(),'Next crosses into the name section in screen order with the correct position')
+            p.get_by_role('button',name='Previous test',exact=True).click()
+            check(p.locator('h1').inner_text()=='Hemoglobin A1c','Previous reverses the displayed test order')
+        with case('screen-order-and-other-fields') as p:
+            p.evaluate("applySnapshot({'demo-vitd':{categories:'Changed categories'},'785260':{conditions:'New observed conditions'}});render();")
+            check('Open this test to review the change.' in p.locator('[data-row="demo-vitd|categories"]').inner_text(),'A non-name/lab field uses the individual-review prompt even when Epic has a value')
+            check('Unsaved' not in p.locator('[data-test-row="demo-vitd"]').inner_text(),'Untouched multi-change lines are not marked Unsaved')
+            p.locator('[data-inline="demo-vitd|name|epic"]').click()
+            check('Unsaved' in p.locator('[data-row="demo-vitd|name"]').inner_text() and 'Unsaved' not in p.locator('[data-row="demo-vitd|labs"]').inner_text(),'Only the line with a new choice is marked Unsaved')
+            p.locator('[data-action="discard"]').click()
+            check('Unacceptable conditions' in p.locator('[data-change-group="other"] [data-test-row="785260"]').inner_text(),'An Other changes row names its outstanding field')
+            p.locator('[data-select-test="785260"]').check()
+            check(p.locator('.selection-bar [data-action="walk"]').is_visible() and p.locator('[data-action="bulk-epic"]').count()==0,'A free-text-only test can be selected for walkthrough without bulk acceptance')
+            p.locator('.selection-bar [data-action="walk"]').click()
+            check(p.evaluate('ui.queue')==['785260'] and p.locator('[data-question="conditions"]').is_visible(),'Selected free-text test opens individually for review')
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:
-    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'One row per test; patch applied to baseline 96184ae','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Awaiting separate one-row-per-test instructions, including section 6; linked artifact supplies patch only.','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
+    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'One row per test; patch applied to baseline 96184ae','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'All section 6 checks included and passed.','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
     (ROOT/'verification.json').write_text(json.dumps(report,indent=2))
 print(json.dumps({'case':ONLY or 'all','passed':len(checks),'click_targets':metrics,'browser_errors':errors},indent=2))

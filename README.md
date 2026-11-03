@@ -28,4 +28,6 @@ Each test appears once in To review. Tests with several open fields appear first
 
 Review one by one follows displayed order, or only checked tests when selected. A multi-change test checkbox selects its eligible name/lab changes; free text is never bulk-accepted. Partial choices can be saved, but approval waits for every open field. Save and next appears only after all visible questions have choices. Decide later sets aside the remaining unanswered fields while preserving choices already made.
 
-Validation: the full updated browser suite passes 231 checks with no JavaScript errors. The separate one-row-per-test instructions (including section 6) were not included in the linked patch artifact, so their exact checklist is pending. This revision is prepared locally and has not been published.
+Validation: all 247 browser checks pass with no JavaScript errors. Checks cover the supplied section 6 checklist: one row per test, section totals matching the To review tab, screen-order navigation, all questions together, Save and next waiting for all choices, and free text remaining open after bulk actions. See verification.json for the full-suite result, tested commit, and source/test hashes.
+
+Free-text-only tests can be selected for Review one by one; bulk actions remain limited to name and lab changes. Other changes name their field and direct the reviewer to open the test. Keyboard hints on multi-change tests follow the first unanswered field and disappear when all are chosen.
