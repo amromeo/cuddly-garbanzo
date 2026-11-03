@@ -1,668 +1,656 @@
 {
-  "verified_at": "2026-11-03T02:31:34.780895+00:00",
-  "commit": "22b9cddf613f935c72af7e28ace542bb6bee95b0",
+  "verified_at": "2026-11-03T04:06:52.174713+00:00",
+  "review": "Make it obvious to use; reviewed baseline 15cf047",
+  "commit": "144bb1fd5b1477e0582a7443b39a488074aa7515",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "source_sha256": "57d11400e5024dd7db54ff43d544e063c17e7eb9ee4b660a3d8e5e98b5051e55",
-  "test_script_sha256": "90cf350166291d55c754bbfe361a672138ad187b3061b4841313bfb3c7545035",
-  "passed": 128,
+  "passed": 127,
   "failed": 0,
-  "section_1_items_covered": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11
-  ],
+  "click_targets": {
+    "single_change_to_download_clicks": 5,
+    "32_name_changes_to_download_clicks": 6,
+    "simple_choice_to_saved_clicks": 2
+  },
+  "storage_key": "olsd-workflow-prototype-v6-choose-save-20261102",
+  "source_sha256": "d9a32100dfe79beee635b9a30ac865fe42ba760182ba7f328e242071c482d93a",
+  "test_script_sha256": "7a02b38f04d333961fd77614868572698b3afeba7b6dc1c454e2bf39c4bdb076",
   "checks": [
     {
-      "item": 1,
-      "description": "Undecided TSH cannot be approved",
+      "case": "five-click-flow",
+      "description": "Choosing Epic does not save the choice",
       "passed": true
     },
     {
-      "item": 1,
-      "description": "Approval blocker names the waiting field",
+      "case": "five-click-flow",
+      "description": "Choosing does not create an approval",
       "passed": true
     },
     {
-      "item": 1,
-      "description": "Approval handler does not invent a decision",
+      "case": "five-click-flow",
+      "description": "Chosen row stays in its original list position until Save",
       "passed": true
     },
     {
-      "item": 1,
-      "description": "Approval comparison includes Epic\u2019s actual value",
+      "case": "five-click-flow",
+      "description": "Inline choice visibly highlights the selected answer",
       "passed": true
     },
     {
-      "item": 1,
-      "description": "Approved value matches the explicit Epic choice",
+      "case": "five-click-flow",
+      "description": "Save persists the explicit choice",
       "passed": true
     },
     {
-      "item": 1,
-      "description": "Approval records exact source values and snapshot dates",
+      "case": "five-click-flow",
+      "description": "Saving never approves",
       "passed": true
     },
     {
-      "item": 2,
-      "description": "Group review reveals open Epic name changes even when proposal equals OLSD",
+      "case": "five-click-flow",
+      "description": "Approval is a separate deliberate click",
       "passed": true
     },
     {
-      "item": 2,
-      "description": "Undecided test has no approval checkbox",
+      "case": "five-click-flow",
+      "description": "Approval does not add a redundant confirmation dialog",
       "passed": true
     },
     {
-      "item": 2,
-      "description": "Already-approved test has no reapproval checkbox",
+      "case": "five-click-flow",
+      "description": "Direct Excel file contains the explicitly chosen name",
       "passed": true
     },
     {
-      "item": 2,
-      "description": "Zero chosen approvals keeps group button disabled",
+      "case": "five-click-flow",
+      "description": "One change reaches a downloaded file in exactly five clicks",
       "passed": true
     },
     {
-      "item": 2,
-      "description": "Eligible group approval starts unticked",
+      "case": "five-click-flow",
+      "description": "After download the real next step is stated",
       "passed": true
     },
     {
-      "item": 2,
-      "description": "Group button reports the selected approval count",
+      "case": "five-click-flow",
+      "description": "One file is recorded only after the download action",
       "passed": true
     },
     {
-      "item": 2,
-      "description": "Group approval leaves existing approval time unchanged",
+      "case": "six-click-bulk",
+      "description": "Select all includes the whole 32-name section, not just rendered rows",
       "passed": true
     },
     {
-      "item": 3,
-      "description": "Unticking and saving does not resolve the source change",
+      "case": "six-click-bulk",
+      "description": "Bulk action clearly names its number of choices",
       "passed": true
     },
     {
-      "item": 3,
-      "description": "Excluded open source change remains in Needs review",
+      "case": "six-click-bulk",
+      "description": "Bulk choice stages 32 choices without saving them",
       "passed": true
     },
     {
-      "item": 3,
-      "description": "Excluding the unresolved field does not permit silent approval",
+      "case": "six-click-bulk",
+      "description": "Bulk selection never silently persists choices",
       "passed": true
     },
     {
-      "item": 3,
-      "description": "Unmapped laboratory remains prominently blocked when unticked",
+      "case": "six-click-bulk",
+      "description": "Save creates 32 updates waiting for their own approval",
       "passed": true
     },
     {
-      "item": 3,
-      "description": "Mapping problem stays open independently of export inclusion",
+      "case": "six-click-bulk",
+      "description": "Approval page states the exact batch count",
       "passed": true
     },
     {
-      "item": 3,
-      "description": "Unmapping cannot be bypassed by a name-only selection",
+      "case": "six-click-bulk",
+      "description": "One named workbook contains all 32 accepted names and the header",
       "passed": true
     },
     {
-      "item": 4,
-      "description": "Role-switch discard restores the saved working value",
+      "case": "six-click-bulk",
+      "description": "32 name changes reach a file in exactly six clicks",
       "passed": true
     },
     {
-      "item": 4,
-      "description": "Role switch completes after a real discard",
+      "case": "six-click-bulk",
+      "description": "Downloaded batch records precisely the approved 32 tests",
       "passed": true
     },
     {
-      "item": 4,
-      "description": "Approving later cannot save discarded text",
+      "case": "two-click-keep-undo",
+      "description": "Keep choice does not change the saved data before Save",
       "passed": true
     },
     {
-      "item": 4,
-      "description": "Stay restores both visible role selectors",
+      "case": "two-click-keep-undo",
+      "description": "Keep means current catalog text, not an earlier working version",
       "passed": true
     },
     {
-      "item": 4,
-      "description": "Stay preserves unsaved work",
+      "case": "two-click-keep-undo",
+      "description": "Keeping finishes on Save with no approval or file",
       "passed": true
     },
     {
-      "item": 4,
-      "description": "Discard also restores the working copy on the Reset route",
+      "case": "two-click-keep-undo",
+      "description": "Undo restores the exact pre-save choice and review state",
       "passed": true
     },
     {
-      "item": 5,
-      "description": "Download is disabled while on-screen edits are unsaved",
+      "case": "bulk-labs-and-free-text",
+      "description": "Editor lab section selects all 11 actionable changes",
       "passed": true
     },
     {
-      "item": 5,
-      "description": "Approved-edit bar explains approval withdrawal",
+      "case": "bulk-labs-and-free-text",
+      "description": "Bulk laboratory choices save exactly their intended tests",
       "passed": true
     },
     {
-      "item": 5,
-      "description": "Dirty bar does not claim the changed content is approved",
+      "case": "bulk-labs-and-free-text",
+      "description": "Bulk saving labs does not approve them",
       "passed": true
     },
     {
-      "item": 5,
-      "description": "Saving an edited approval makes it out of date",
+      "case": "bulk-labs-and-free-text",
+      "description": "Free-text changes never offer a bulk-accept checkbox",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Direct download is a readable Excel workbook",
+      "case": "bulk-labs-and-free-text",
+      "description": "Free-text changes never offer inline bulk Epic acceptance",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Export reduces Ready to export count",
+      "case": "question-cards",
+      "description": "Test page asks one question at a time",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Test displays exported date and filename",
+      "case": "question-cards",
+      "description": "Epic answer card contains the real new name",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Progress reflects the exported stage",
+      "case": "question-cards",
+      "description": "Keep card contains the real current catalog name",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Matching snapshot produces an observed confirmation state",
+      "case": "question-cards",
+      "description": "No answer is preselected",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Progress reflects snapshot confirmation",
+      "case": "question-cards",
+      "description": "No always-on disabled save bar appears before a choice",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Confirmed update is not offered as new ready work",
+      "case": "question-cards",
+      "description": "Chosen answer remains visible and changeable before Save",
       "passed": true
     },
     {
-      "item": 6,
-      "description": "Downloading an exported version again is explicit",
+      "case": "question-cards",
+      "description": "Changing an unsaved answer updates the staged value only",
       "passed": true
     },
     {
-      "item": 7,
-      "description": "Different selected columns produce separately named files",
+      "case": "question-cards",
+      "description": "Discard removes the unsaved answer without touching saved state",
       "passed": true
     },
     {
-      "item": 7,
-      "description": "Opening file chooser records no downloads",
+      "case": "question-cards",
+      "description": "The test page uses stacked cards and content instead of a sideways table",
       "passed": true
     },
     {
-      "item": 7,
-      "description": "Done without downloading creates no export history",
+      "case": "question-cards",
+      "description": "Other catalog text is readable without expanding an instruction panel",
       "passed": true
     },
     {
-      "item": 7,
-      "description": "Only the clicked file is recorded",
+      "case": "save-next-and-shortcuts",
+      "description": "Another waiting test makes Save and next the primary action",
       "passed": true
     },
     {
-      "item": 7,
-      "description": "Chooser shows downloaded status per file",
+      "case": "save-next-and-shortcuts",
+      "description": "Save and next moves to the next waiting test",
       "passed": true
     },
     {
-      "item": 7,
-      "description": "Other file remains explicitly not downloaded",
+      "case": "save-next-and-shortcuts",
+      "description": "Moving next saves the prior choice without approving it",
       "passed": true
     },
     {
-      "item": 7,
-      "description": "Only the downloaded file\u2019s test is marked exported",
+      "case": "save-next-and-shortcuts",
+      "description": "Shortcut 1 chooses the actual Epic answer",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "Unexpected OLSD change invalidates an included-field approval",
+      "case": "save-next-and-shortcuts",
+      "description": "Shortcut 2 chooses the actual current catalog answer",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "Changed OLSD source returns approved work to Needs review",
+      "case": "save-next-and-shortcuts",
+      "description": "Ctrl+S saves without approving",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "New snapshot preserves the saved authored text",
+      "case": "save-next-and-shortcuts",
+      "description": "Saved keep does not offer an unnecessary approval",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "Changed included OLSD value appears outside Other fields",
+      "case": "set-aside-return",
+      "description": "Saving Decide later removes the test from To review",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "Approval retains the original exact OLSD basis",
+      "case": "set-aside-return",
+      "description": "Set-aside choice is findable under All tests",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "Unselected changed OLSD field is still visible as open work",
+      "case": "set-aside-return",
+      "description": "A later Epic change returns the set-aside test to review",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "Unselected source notice explains what changed",
+      "case": "set-aside-return",
+      "description": "Prior note and old/new context remain visible",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "Snapshot does not silently select an optional field for export",
+      "case": "set-aside-return",
+      "description": "A deferred choice is not mislabeled as kept wording",
       "passed": true
     },
     {
-      "item": 8,
-      "description": "New Epic values also invalidate included approved source basis",
+      "case": "guards-and-role-discard",
+      "description": "Leaving an unsaved choice warns before changing role",
       "passed": true
     },
     {
-      "item": 9,
-      "description": "Keep current OLSD value means the observed OLSD value, not the saved draft",
+      "case": "guards-and-role-discard",
+      "description": "Stay restores the role selector and retains the unsaved choice",
       "passed": true
     },
     {
-      "item": 9,
-      "description": "Pure keep finishes on save without approval or export",
+      "case": "guards-and-role-discard",
+      "description": "Discard restores saved data before changing role",
       "passed": true
     },
     {
-      "item": 9,
-      "description": "Typing after Use Epic switches to Use my wording",
+      "case": "guards-and-role-discard",
+      "description": "Discarded choice no longer looks selected",
       "passed": true
     },
     {
-      "item": 9,
-      "description": "Custom wording different from Epic appears in Reviewed differences",
+      "case": "approval-and-send-back",
+      "description": "Approval guard never invents an undecided Epic choice",
       "passed": true
     },
     {
-      "item": 9,
-      "description": "Displayed choice follows the actual custom value",
+      "case": "approval-and-send-back",
+      "description": "Approval captures both dated sets of values",
       "passed": true
     },
     {
-      "item": 10,
-      "description": "Proposed performing laboratories preserve their separate lines",
+      "case": "approval-and-send-back",
+      "description": "A visible reviewed change approves without another confirmation",
       "passed": true
     },
     {
-      "item": 10,
-      "description": "Browser styling preserves laboratory line breaks",
+      "case": "approval-and-send-back",
+      "description": "Withdraw returns the saved update to approval work",
       "passed": true
     },
     {
-      "item": 11,
-      "description": "Saved Epic choice appears under Decided rather than Needs a decision",
+      "case": "approval-and-send-back",
+      "description": "Send back returns the update to review",
       "passed": true
     },
     {
-      "item": 11,
-      "description": "Decided header does not contradict completed decisions",
+      "case": "approval-and-send-back",
+      "description": "Sent-back catalog edits are not falsely called new Epic changes",
       "passed": true
     },
     {
-      "item": 11,
-      "description": "Keep decision remains visible and changeable",
+      "case": "download-edits-and-status",
+      "description": "Starting an approved edit removes the old download action from that screen",
       "passed": true
     },
     {
-      "item": 11,
-      "description": "A kept decision can be changed without opening hidden reference fields",
+      "case": "download-edits-and-status",
+      "description": "Unsaved edits cannot be approved",
       "passed": true
     },
     {
-      "item": 11,
-      "description": "Approved conditions appear under Approved changes",
+      "case": "download-edits-and-status",
+      "description": "Saving an approved edit withdraws its old approval",
       "passed": true
     },
     {
-      "item": 11,
-      "description": "Approved change is not labeled completeness-only",
+      "case": "download-edits-and-status",
+      "description": "Downloaded tests leave To download",
       "passed": true
     },
     {
-      "item": 11,
-      "description": "Saving an unselected mapping does not claim approvals occurred",
+      "case": "download-edits-and-status",
+      "description": "Downloaded test states the import task plainly",
       "passed": true
     },
     {
-      "item": 13,
-      "description": "Search finds deferred tests outside the active tab",
+      "case": "download-edits-and-status",
+      "description": "Later matching catalog marks the test done",
       "passed": true
     },
     {
-      "item": 13,
-      "description": "Changing search clears previously hidden selected rows",
+      "case": "download-edits-and-status",
+      "description": "Done tests leave all active lists",
       "passed": true
     },
     {
-      "item": 13,
-      "description": "Search also finds already approved tests outside Needs review",
+      "case": "download-edits-and-status",
+      "description": "Up-to-date tests have no unnecessary status label",
       "passed": true
     },
     {
-      "item": 14,
-      "description": "Other fields expose an explicit Edit action",
+      "case": "multiple-files-one-click",
+      "description": "Different catalog updates clearly name the number of Excel files",
       "passed": true
     },
     {
-      "item": 14,
-      "description": "Edit automatically includes the field in the update",
+      "case": "multiple-files-one-click",
+      "description": "Separate Excel files have a plain-language explanation",
       "passed": true
     },
     {
-      "item": 14,
-      "description": "Edit directly enables authoring instead of requiring a checkbox guess",
+      "case": "multiple-files-one-click",
+      "description": "A single explicit click starts both separate Excel files",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Sample catalog includes hundreds of records",
+      "case": "multiple-files-one-click",
+      "description": "There is no intermediate chooser or ZIP dialog",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Nightly summary reports types of source changes",
+      "case": "multiple-files-one-click",
+      "description": "Each file initiated by the explicit download action is recorded",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Worklist uses one set of status filters rather than duplicate tiles",
+      "case": "multiple-files-one-click",
+      "description": "Each separately downloaded file is valid Excel",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Review selected is the primary Needs review action",
+      "case": "multiple-files-one-click",
+      "description": "Each separately downloaded file is valid Excel",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Untouched tests say No draft",
+      "case": "snapshot-staleness",
+      "description": "Unexpected Epic changes return approved work to To review",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Catalog pagination advances to another page",
+      "case": "snapshot-staleness",
+      "description": "Approval\u2019s original dated values are retained",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Sorting orders the catalog by name",
+      "case": "snapshot-staleness",
+      "description": "Unselected unexpected catalog content is still a review question",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Mapping change-type filter narrows review naturally",
+      "case": "snapshot-staleness",
+      "description": "Multiple open changes still show one question at a time",
       "passed": true
     },
     {
-      "item": 15,
-      "description": "Lab filter combines with the selected change type",
+      "case": "custom-wording-and-plain-entry",
+      "description": "Typed wording records a deliberate custom choice and remains discoverable",
       "passed": true
     },
     {
-      "item": 16,
-      "description": "Comparison highlights added and removed words",
+      "case": "custom-wording-and-plain-entry",
+      "description": "See changes shows exact before and after wording",
       "passed": true
     },
     {
-      "item": 16,
-      "description": "Approval dialog includes highlighted differences",
+      "case": "custom-wording-and-plain-entry",
+      "description": "Exact unsaved comparison keeps word-level highlighting",
       "passed": true
     },
     {
-      "item": 16,
-      "description": "Unsaved comparison highlights exact text changes",
+      "case": "custom-wording-and-plain-entry",
+      "description": "A test with no open changes displays its complete catalog entry",
       "passed": true
     },
     {
-      "item": 16,
-      "description": "Group review also highlights differences",
+      "case": "custom-wording-and-plain-entry",
+      "description": "Unchanged entry has no fake decision or disabled main action",
       "passed": true
     },
     {
-      "item": 17,
-      "description": "Saved decision reason appears in test history",
+      "case": "custom-wording-and-plain-entry",
+      "description": "Unchanged content does not offer Decide later or other meaningless decisions",
       "passed": true
     },
     {
-      "item": 17,
-      "description": "Returned review shows prior kept choice, reason, and old/new Epic values",
+      "case": "custom-wording-and-plain-entry",
+      "description": "Test name starts as read-only catalog content",
       "passed": true
     },
     {
-      "item": 17,
-      "description": "Deferred record displays its saved reason",
+      "case": "custom-wording-and-plain-entry",
+      "description": "Editing a normal catalog entry uses Save, not a stray review-queue navigation",
       "passed": true
     },
     {
-      "item": 18,
-      "description": "Unchanged keep leaves Drafts and remains in Reviewed differences",
+      "case": "blocked-and-capabilities",
+      "description": "Editor To review count excludes the unmapped test and deferred test",
       "passed": true
     },
     {
-      "item": 18,
-      "description": "Pure keep offers no approval for an unchanged file",
+      "case": "blocked-and-capabilities",
+      "description": "Editor sees a quiet link for administrator-only work",
       "passed": true
     },
     {
-      "item": 18,
-      "description": "Pure keep offers no unnecessary export",
+      "case": "blocked-and-capabilities",
+      "description": "Blocked test gives a plain lab-name explanation",
       "passed": true
     },
     {
-      "item": 19,
-      "description": "Blocker does not tell an untouched user to use disabled Save",
+      "case": "blocked-and-capabilities",
+      "description": "A blocked test does not pretend it has an answer card the editor can use",
       "passed": true
     },
     {
-      "item": 19,
-      "description": "Administrator request is a clearly identified local placeholder",
+      "case": "blocked-and-capabilities",
+      "description": "Request-help placeholder clearly identifies its limits",
       "passed": true
     },
     {
-      "item": 19,
-      "description": "New mapping appears in Existing mappings",
+      "case": "blocked-and-capabilities",
+      "description": "Performing laboratories never offer a nonfunctional Write my own",
       "passed": true
     },
     {
-      "item": 19,
-      "description": "Mapping flow provides a direct return to the test",
+      "case": "blocked-and-capabilities",
+      "description": "Administrators see waiting lab-name work first",
       "passed": true
     },
     {
-      "item": 20,
-      "description": "Save notification does not cover approval or save controls",
+      "case": "blocked-and-capabilities",
+      "description": "Saving a lab name enables review without combining it with approval",
       "passed": true
     },
     {
-      "item": 21,
-      "description": "Promotional worklist slogans were removed",
+      "case": "blocked-and-capabilities",
+      "description": "Lab-name task provides a direct return to the test",
       "passed": true
     },
     {
-      "item": 21,
-      "description": "System wording stays task-specific",
+      "case": "search-back-and-mobile",
+      "description": "Search finds tests outside the selected worklist tab",
       "passed": true
     },
     {
-      "item": 22,
-      "description": "Editor worklist omits irrelevant administrator-only upload text",
+      "case": "search-back-and-mobile",
+      "description": "Search uses correct singular result wording",
       "passed": true
     },
     {
-      "item": 22,
-      "description": "Sample identity wording avoids fixture terminology",
+      "case": "search-back-and-mobile",
+      "description": "No status tab falsely remains active during global search",
       "passed": true
     },
     {
-      "item": 22,
-      "description": "Field provenance uses plain Comes from wording",
+      "case": "search-back-and-mobile",
+      "description": "Worklist selection survives opening a test and returning",
       "passed": true
     },
     {
-      "item": 23,
-      "description": "Top identity consistently starts with Demo editor",
+      "case": "search-back-and-mobile",
+      "description": "A test URL survives refresh",
       "passed": true
     },
     {
-      "item": 23,
-      "description": "Top identity follows administrator role changes",
+      "case": "search-back-and-mobile",
+      "description": "Browser Back stays inside the app",
       "passed": true
     },
     {
-      "item": 23,
-      "description": "Role can be switched back consistently",
+      "case": "search-back-and-mobile",
+      "description": "Phone worklist does not require sideways scrolling",
       "passed": true
     },
     {
-      "item": 23,
-      "description": "Role labels do not mix editor and steward",
+      "case": "search-back-and-mobile",
+      "description": "One phone role selector works both ways",
       "passed": true
     },
     {
-      "item": 24,
-      "description": "Source dates include year, time zone, and age",
+      "case": "search-back-and-mobile",
+      "description": "Phone reset is available in the sample-data strip",
       "passed": true
     },
     {
-      "item": 24,
-      "description": "Overdue source check changes its indicator and text",
+      "case": "search-back-and-mobile",
+      "description": "Phone choice cards stack without a scrolling table",
       "passed": true
     },
     {
-      "item": 25,
-      "description": "Row checkbox retains keyboard focus",
+      "case": "search-back-and-mobile",
+      "description": "Phone decision targets exceed 44px",
       "passed": true
     },
     {
-      "item": 25,
-      "description": "Changing worklist view restores focus to its button",
+      "case": "screen-rules-and-focus",
+      "description": "First change is visible well above the previous 562px starting point",
       "passed": true
     },
     {
-      "item": 25,
-      "description": "Decision remains focused after moving into Decided",
+      "case": "screen-rules-and-focus",
+      "description": "Only the four requested worklist tabs are present",
       "passed": true
     },
     {
-      "item": 25,
-      "description": "Dialog returns focus to its actual opener",
+      "case": "screen-rules-and-focus",
+      "description": "Sidebar, repeated tiles, and separate group-review action are removed",
       "passed": true
     },
     {
-      "item": 26,
-      "description": "Comparison exposes real table column headers",
+      "case": "screen-rules-and-focus",
+      "description": "There is one demo role control",
       "passed": true
     },
     {
-      "item": 26,
-      "description": "Each compared value is associated with its field and column",
+      "case": "screen-rules-and-focus",
+      "description": "Body text uses the requested 15px size",
       "passed": true
     },
     {
-      "item": 26,
-      "description": "Only one live status region exists, rather than every chip",
+      "case": "screen-rules-and-focus",
+      "description": "Small visible labels meet the 13px minimum",
       "passed": true
     },
     {
-      "item": 27,
-      "description": "Worklist filters use plain accessible buttons instead of incomplete tabs",
+      "case": "screen-rules-and-focus",
+      "description": "No disabled main action is shown",
       "passed": true
     },
     {
-      "item": 28,
-      "description": "Essential note labels meet the 12px minimum",
+      "case": "screen-rules-and-focus",
+      "description": "Inline choice retains keyboard focus",
       "passed": true
     },
     {
-      "item": 28,
-      "description": "Muted text meets normal-text contrast on the page background",
+      "case": "screen-rules-and-focus",
+      "description": "Unsaved choices have exactly one main action",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Removing an existing category opens a confirmation",
+      "case": "screen-rules-and-focus",
+      "description": "Selecting more rows does not create two competing main actions",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Escape restores the category checkbox to the unchanged draft",
+      "case": "screen-rules-and-focus",
+      "description": "Dialog returns focus to See changes",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Additional-category section stays open after ticking",
+      "case": "screen-rules-and-focus",
+      "description": "One live feedback region avoids repeated per-chip announcements",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Refresh restores the selected test URL",
+      "case": "multiple-questions-and-validation",
+      "description": "Two open changes are still presented one question at a time",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Browser Back navigates within the app",
+      "case": "multiple-questions-and-validation",
+      "description": "Decide later sets the whole test aside even when another change is waiting",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Phone role selector can enter administrator mode",
+      "case": "multiple-questions-and-validation",
+      "description": "A new Epic change reopens a test that was set aside for a different question",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Phone role selector can return to editor without resetting",
+      "case": "multiple-questions-and-validation",
+      "description": "An empty required name cannot be saved into an unreachable approval state",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Reset is available in phone demo controls",
+      "case": "multiple-questions-and-validation",
+      "description": "Invalid save explains what to enter without a disabled primary button",
       "passed": true
     },
     {
-      "item": 29,
-      "description": "Worklist fits the phone viewport",
-      "passed": true
-    },
-    {
-      "item": 29,
+      "case": "multiple-questions-and-validation",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/22b9cddf613f935c72af7e28ace542bb6bee95b0",
-  "commit_scope": "Exact application and regression-script source tested; verification metadata is recorded separately.",
-  "sample_records": 306,
-  "storage_key": "olsd-workflow-prototype-v5-review-20261102"
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/144bb1fd5b1477e0582a7443b39a488074aa7515",
+  "commit_scope": "Exact tested application and check script; verification is recorded in a following commit.",
+  "sample_records": 306
 }
