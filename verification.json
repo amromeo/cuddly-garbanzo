@@ -1,9 +1,9 @@
 {
-  "verified_at": "2026-11-03T20:19:30.062737+00:00",
-  "review": "Next fixes reviewed at e1f02f2: draft notes, retained deferred wording, immutable confirmations and matching cards",
-  "commit": "fb03e1fddcf21c95c0710275c191a954ecd5fb70",
+  "verified_at": "2026-11-03T20:46:17.625326+00:00",
+  "review": "Combined Thread A comparison fixes and Thread B notes/cards; base c7223dd",
+  "commit": "0efe9bb4fbe9517064d915df6334718c8577cc2a",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 415,
+  "passed": 498,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
@@ -13,10 +13,14 @@
   "storage_key": "olsd-workflow-prototype-v7-test-by-test-20261103",
   "sample_count": 308,
   "patch_baseline": "96184ae",
-  "requested_checklist_status": "Browser checks cover all requested items 1\u20134 and the small fixes; earlier workflow regressions retained.",
-  "review_baseline": "e1f02f2",
-  "source_sha256": "1d7729cfbe52564bf4deaad3846b05cbd6557fd388918c16ce4c769a122d531c",
-  "test_script_sha256": "4df2d6836eeb18c6b6487221f783954fe07793bed07bfed077ee535dec0686b6",
+  "requested_checklist_status": "Browser checks cover Thread A items 1\u20132, Thread B notes/cards and mismatch positions, and the OLSD-only keyboard integration; earlier workflow regressions retained.",
+  "review_baseline": "c7223dd",
+  "integration_commits": {
+    "thread_a": "3cf0e02",
+    "thread_b": "1220f38"
+  },
+  "source_sha256": "ef908346d8e68dabadbe71eea6962d7f1f7b7f9a58e8c4384a8c87cf22516715",
+  "test_script_sha256": "ab462f27625de555f552cd0233578a0ae4d1013ac48b115b3193d11c1c8347a8",
   "checks": [
     {
       "case": "five-click-flow",
@@ -1909,6 +1913,196 @@
       "passed": true
     },
     {
+      "case": "a-mismatch-positions",
+      "description": "A1: four matching tests become Done with mismatch at position 0",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: only the differing test returns to review at position 0",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: matching tests retain approval and have no false open changes",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: comparison reports matched rows as Done without retiring the file",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: the mismatch is named with the requested review instruction",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: a comparison result does not show a manual-retirement warning",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: matching rows and comparison-only status survive reload",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: a later fully matching observation confirms all rows",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: four matching tests become Done with mismatch at position 2",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: only the differing test returns to review at position 2",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: matching tests retain approval and have no false open changes",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: comparison reports matched rows as Done without retiring the file",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: the mismatch is named with the requested review instruction",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: a comparison result does not show a manual-retirement warning",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: matching rows and comparison-only status survive reload",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: a later fully matching observation confirms all rows",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: four matching tests become Done with mismatch at position 4",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: only the differing test returns to review at position 4",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: matching tests retain approval and have no false open changes",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: comparison reports matched rows as Done without retiring the file",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: the mismatch is named with the requested review instruction",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: a comparison result does not show a manual-retirement warning",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: matching rows and comparison-only status survive reload",
+      "passed": true
+    },
+    {
+      "case": "a-mismatch-positions",
+      "description": "A1: a later fully matching observation confirms all rows",
+      "passed": true
+    },
+    {
+      "case": "a-unchanged-mismatch",
+      "description": "A1: an observed value unchanged from the old snapshot still returns to review when it differs from the file",
+      "passed": true
+    },
+    {
+      "case": "a-person-retirement",
+      "description": "A1: a person\u2019s changed choice keeps the file retired even if a later observation matches it",
+      "passed": true
+    },
+    {
+      "case": "a-person-retirement",
+      "description": "A1: a retired import does not silently reinstate the person\u2019s approval",
+      "passed": true
+    },
+    {
+      "case": "a-person-retirement",
+      "description": "A1: a person\u2019s withdrawal keeps the file retired even if a later observation matches it",
+      "passed": true
+    },
+    {
+      "case": "a-person-retirement",
+      "description": "A1: a retired import does not silently reinstate the person\u2019s approval",
+      "passed": true
+    },
+    {
+      "case": "a-download-wording",
+      "description": "A2: a normal one-test download uses the short wording",
+      "passed": true
+    },
+    {
+      "case": "a-download-wording",
+      "description": "A2: an entirely unconfirmed multi-test file also uses the short wording",
+      "passed": true
+    },
+    {
+      "case": "a-download-wording",
+      "description": "A2: a partially confirmed file names the tests the longer wording applies to",
+      "passed": true
+    },
+    {
+      "case": "a-download-wording",
+      "description": "A2: a test not supplied in a partial observation remains unconfirmed without an invented mismatch",
+      "passed": true
+    },
+    {
+      "case": "a-recover-comparison-cascade",
+      "description": "A1: older saved comparison cascades recover the four matching tests without resetting data",
+      "passed": true
+    },
+    {
+      "case": "a-recover-comparison-cascade",
+      "description": "A1: recovery keeps the actual mismatch in review without a false retirement warning",
+      "passed": true
+    },
+    {
+      "case": "a-single-card-no-epic",
+      "description": "Integration: an OLSD-only change offers shortcut 1",
+      "passed": true
+    },
+    {
+      "case": "a-single-card-no-epic",
+      "description": "Integration: shortcut 1 selects the sole card when no Epic value exists",
+      "passed": true
+    },
+    {
+      "case": "a-single-card-no-epic",
+      "description": "Integration: the keyboard choice remains unsaved",
+      "passed": true
+    },
+    {
       "case": "e1-1-unsaved-notes",
       "description": "1: a draft note survives choosing Epic as the first choice",
       "passed": true
@@ -2089,11 +2283,236 @@
       "passed": true
     },
     {
-      "case": "e1-5-short-filenames",
+      "case": "b-entry-notes",
+      "description": "Unchanged name offers no note-only choice",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Saving unchanged name creates no empty choice",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Changed name offers Add a note under Edit",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Unsaved name note stays while wording changes",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Typing name and a note does not save",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Save keeps name wording and note without approving",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Changing saved name wording clears the saved note and shows Earlier note",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "A newly typed name note survives further edits",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Unchanged conditions offers no note-only choice",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Saving unchanged conditions creates no empty choice",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Changed conditions offers Add a note under Edit",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Unsaved conditions note stays while wording changes",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Typing conditions and a note does not save",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Save keeps conditions wording and note without approving",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "Changing saved conditions wording clears the saved note and shows Earlier note",
+      "passed": true
+    },
+    {
+      "case": "b-entry-notes",
+      "description": "A newly typed conditions note survives further edits",
+      "passed": true
+    },
+    {
+      "case": "b-single-card-number",
+      "description": "The sole Keep OLSD answer card is numbered 1",
+      "passed": true
+    },
+    {
+      "case": "b-single-card-number",
+      "description": "The sole card starts unselected",
+      "passed": true
+    },
+    {
+      "case": "b-single-card-number",
+      "description": "Shortcut 1 chooses the sole card without saving",
+      "passed": true
+    },
+    {
+      "case": "b-single-card-number",
+      "description": "Keeping OLSD finishes on Save without approval or a file",
+      "passed": true
+    },
+    {
+      "case": "b-single-card-number",
+      "description": "Two distinct answer cards retain numbers 1 and 2",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "One file contains all five approved tests",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "One file contains all five approved tests",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "One file contains all five approved tests",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 1: matching test demo-crp is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 1: matching test sample-10 is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 1: matching test sample-20 is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 1: matching test sample-30 is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 1: differing test returns to To review with an OLSD name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 1: Downloads does not mark the file Do not import",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 1: Downloads names the test that differs",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 3: matching test demo-tsh is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 3: matching test demo-crp is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 3: matching test sample-20 is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 3: matching test sample-30 is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 3: differing test returns to To review with an OLSD name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 3: Downloads does not mark the file Do not import",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 3: Downloads names the test that differs",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 5: matching test demo-tsh is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 5: matching test demo-crp is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 5: matching test sample-10 is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 5: matching test sample-20 is confirmed, stays out of To review, and has no open name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 5: differing test returns to To review with an OLSD name change",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 5: Downloads does not mark the file Do not import",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
+      "description": "Mismatch position 5: Downloads names the test that differs",
+      "passed": true
+    },
+    {
+      "case": "b-mismatch-positions",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/fb03e1fddcf21c95c0710275c191a954ecd5fb70",
-  "commit_scope": "Tested application, browser checks, and reviewer documents; verification metadata committed separately."
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/0efe9bb4fbe9517064d915df6334718c8577cc2a",
+  "verification_scope": "Full Chromium browser suite against rebuilt index.html, including unchanged Thread B b-mismatch-positions at positions 0, 2, and 4; 308 sample tests."
 }
