@@ -1,4 +1,4 @@
-# OLSD workflow demo — revision 11
+# OLSD workflow demo — revision 12
 
 Static prototype with 308 sample tests. Open `index.html` or the website preview. No live Epic, OLSD, Connect, Helix, or pin connections.
 
@@ -7,7 +7,7 @@ Static prototype with 308 sample tests. Open `index.html` or the website preview
 - `app-script.js`: maintainable client source embedded in the HTML.
 - `check_workflows.py`: browser regression checks, measured click targets, and Excel readback.
 - `verification.json`: date, exact tested source commit, hashes, check results, and test-script link.
-- `REVIEW_CHANGES.md`: changes requested against commit e1f02f2.
+- `REVIEW_CHANGES.md`: combined Thread A/B changes based on c7223dd.
 
 The existing storage key, `olsd-workflow-prototype-v7-test-by-test-20261103`, is retained. This update preserves previously saved browser work. Reset, role, and demo-check controls remain available on desktop and phone.
 
@@ -48,4 +48,8 @@ See verification.json for the current full-suite result and measured click paths
 
 Decide later also retains the earlier saved value separately from the reset proposal. Decide now shows that choice accurately and offers different custom wording without replacing it with OLSD text. When Epic and OLSD match, their identical cards are merged. Confirmation receipts are stored per test/file and remain separate from later snapshot comparisons.
 
-Release validation: 415 browser checks passed, with no JavaScript errors. The measured save/single-download/32-name paths remain 2/5/7 clicks.
+Release validation: 498 browser checks passed, with no JavaScript errors. The measured save/single-download/32-name paths remain 2/5/7 clicks.
+
+This release integrates Thread A (`3cf0e02`) and Thread B (`1220f38`). Snapshot comparison freezes each test's expected file row before processing any results. A mismatch returns only that test to review; matching tests become Done regardless of row order. Downloads names the differing test and directs the reviewer to To review. This comparison outcome does not retire the file or warn against importing it; a person's changed choice or withdrawn approval still retires unconfirmed files. Older comparison-cascade records are repaired without resetting browser data.
+
+New files say “Nothing has reached OLSD yet.” A partly confirmed file names the remaining unconfirmed tests. Editing Other fields offers Add a note. Single-card choices display shortcut 1, and the keyboard handler supports both matching Epic/OLSD values and fields with no Epic source. Thread B's owned functions and mismatch-position check are retained unchanged.

@@ -876,6 +876,14 @@ with sync_playwright() as pw:
             p.reload()
             check(p.evaluate("['demo-crp','sample-10','sample-20','sample-30'].every(id=>confirmed(byId(id))&&!toReview(byId(id)))"),'A1: older saved comparison cascades recover the four matching tests without resetting data')
             check(p.evaluate("toReview(byId('demo-tsh'))") and p.locator('.outdated-file').count()==0,'A1: recovery keeps the actual mismatch in review without a false retirement warning')
+    if ONLY in [None,'a-single-card-no-epic']:
+        with case('a-single-card-no-epic') as p:
+            p.evaluate("applySnapshot({'sample-1':{conditions:'New observed conditions'}});render();")
+            open_test(p,'sample-1')
+            check(p.locator('[data-answer="conditions:olsd"] .shortcut').inner_text()=='1','Integration: an OLSD-only change offers shortcut 1')
+            p.keyboard.press('1')
+            check(p.locator('[data-answer="conditions:olsd"]').get_attribute('aria-pressed')=='true','Integration: shortcut 1 selects the sole card when no Epic value exists')
+            check(p.evaluate("!byId('sample-1').decisions.conditions"),'Integration: the keyboard choice remains unsaved')
     if ONLY in [None,'e1-1-unsaved-notes']:
         for first in [None,'olsd']:
             with case('e1-1-unsaved-notes') as p:
@@ -1019,6 +1027,6 @@ with sync_playwright() as pw:
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:
-    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Next fixes reviewed at e1f02f2: draft notes, retained deferred wording, immutable confirmations and matching cards','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Browser checks cover all requested items 1–4 and the small fixes; earlier workflow regressions retained.','review_baseline':'e1f02f2','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
+    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Combined Thread A comparison fixes and Thread B notes/cards; base c7223dd','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Browser checks cover Thread A items 1–2, Thread B notes/cards and mismatch positions, and the OLSD-only keyboard integration; earlier workflow regressions retained.','review_baseline':'c7223dd','integration_commits':{'thread_a':'3cf0e02','thread_b':'1220f38'},'source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
     (ROOT/'verification.json').write_text(json.dumps(report,indent=2))
 print(json.dumps({'case':ONLY or 'all','passed':len(checks),'click_targets':metrics,'browser_errors':errors},indent=2))

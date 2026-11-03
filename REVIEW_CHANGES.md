@@ -1,3 +1,18 @@
+# Revision 12 — independent test comparisons and Thread B integration
+
+Based on c7223dd. Integrates Thread A (`3cf0e02`) and Thread B (`1220f38`). Retains all 308 sample tests, the existing storage key, one row per test, and the separate choose/save/approve/download steps.
+
+1. Snapshot comparisons capture each test's own expected file row before changing any state. One mismatch cannot invalidate another test's expected values. Matching tests become Done and stay out of To review; the differing test returns to review. Multi-test browser checks exercise mismatches first, middle, and last, including Thread B's `b-mismatch-positions` unchanged. Older browser data affected by a comparison cascade is repaired without a reset.
+2. A comparison mismatch says which test differs from the file and directs the reviewer to To review. It does not label the observed file “Do not import.” A changed choice or approval withdrawal still retires unconfirmed files with that warning. Confirmed receipts remain historical records.
+3. Normal downloads say “Nothing has reached OLSD yet.” Only partly confirmed files use the longer wording and name the remaining tests.
+4. Thread B's Add a note control for entry edits and single-card numbering are integrated without editing `choiceCards` or `entryEditor`. An additional keyboard-handler regression covers the sole card for a field without an Epic source. No Thread B check was changed.
+
+Release validation: 498 browser checks passed, with no JavaScript errors. The measured save/single-download/32-name paths remain 2/5/7 clicks. See verification.json for the exact tested source commit, source/test hashes, date, and integration commits.
+
+Posit Connect remains the intended production target. This published site is still the sample-data browser prototype.
+
+---
+
 # Revision 11 — draft notes and durable confirmations
 
 Addresses the review at e1f02f2. The 308-test sample catalog, storage key, one-row-per-test workflow, and separate choose/save/approve/download actions are retained.
