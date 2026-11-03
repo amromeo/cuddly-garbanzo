@@ -1,9 +1,9 @@
 {
-  "verified_at": "2026-11-03T19:56:36.118340+00:00",
-  "review": "Next fixes reviewed at 138948c: deferral, retired downloads, note provenance and approval guidance",
-  "commit": "a94ea42263870888d0d4d7feb3624766bd89a82c",
+  "verified_at": "2026-11-03T20:19:30.062737+00:00",
+  "review": "Next fixes reviewed at e1f02f2: draft notes, retained deferred wording, immutable confirmations and matching cards",
+  "commit": "fb03e1fddcf21c95c0710275c191a954ecd5fb70",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 379,
+  "passed": 415,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
@@ -14,9 +14,9 @@
   "sample_count": 308,
   "patch_baseline": "96184ae",
   "requested_checklist_status": "Browser checks cover all requested items 1\u20134 and the small fixes; earlier workflow regressions retained.",
-  "review_baseline": "138948c",
-  "source_sha256": "aabb68e1ded8513b7f028134be75819d6ad3cbae24b1cf97d8c00cb258ef3d7b",
-  "test_script_sha256": "c934dde89cf1eb19f197f905433c152ddbbd1db8fb59a5e5fe2a2cd66656abe5",
+  "review_baseline": "e1f02f2",
+  "source_sha256": "1d7729cfbe52564bf4deaad3846b05cbd6557fd388918c16ce4c769a122d531c",
+  "test_script_sha256": "4df2d6836eeb18c6b6487221f783954fe07793bed07bfed077ee535dec0686b6",
   "checks": [
     {
       "case": "five-click-flow",
@@ -1909,11 +1909,191 @@
       "passed": true
     },
     {
-      "case": "retire-5-small-fixes",
+      "case": "e1-1-unsaved-notes",
+      "description": "1: a draft note survives choosing Epic as the first choice",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: an unsaved note is not relabeled as Earlier note",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: approval includes the deliberately typed draft note",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: a draft note survives choosing Epic after an unsaved Keep",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: an unsaved note is not relabeled as Earlier note",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: approval includes the deliberately typed draft note",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: correcting unsaved wording preserves the newly typed note",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: Save retains a draft note after wording correction",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: a fresh draft reason survives while the earlier saved reason is shown separately",
+      "passed": true
+    },
+    {
+      "case": "e1-1-unsaved-notes",
+      "description": "1: explicitly retyping an identical saved note counts as deliberate reuse",
+      "passed": true
+    },
+    {
+      "case": "e1-2-deferred-wording",
+      "description": "2: Decide now accurately describes the earlier saved custom value",
+      "passed": true
+    },
+    {
+      "case": "e1-2-deferred-wording",
+      "description": "2: both the retained-wording card and text box preserve the saved wording after reload",
+      "passed": true
+    },
+    {
+      "case": "e1-2-deferred-wording",
+      "description": "2: the retained wording can be chosen and saved for approval again",
+      "passed": true
+    },
+    {
+      "case": "e1-2-deferred-wording",
+      "description": "2: deferred Use Epic history shows the actual saved laboratories",
+      "passed": true
+    },
+    {
+      "case": "e1-2-deferred-wording",
+      "description": "2: older deferrals recover the saved wording from their change history",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: a wording change on a done test does not warn that the confirmed file is out of date",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: confirmed download remains Done after a later wording change",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: the original confirmation date remains immutable",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "5: download comparisons use matches this file",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: confirmed history survives a reload after editing",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: a Epic change on a done test does not warn that the confirmed file is out of date",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: confirmed download remains Done after a later Epic change",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: the original confirmation date remains immutable",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "5: download comparisons use matches this file",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: confirmed history survives a reload after editing",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: confirmation can be recorded independently for tests in a shared file",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: revising a confirmed row preserves its receipt and returns unconfirmed rows for a clean file",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: only unconfirmed tests are retired in a partially confirmed file",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: mixed history shows the confirmed test as Done and the remaining file as unsafe to import",
+      "passed": true
+    },
+    {
+      "case": "e1-3-confirmed-files-stay-done",
+      "description": "3: older confirmed files incorrectly retired by the prior version recover their Done receipt",
+      "passed": true
+    },
+    {
+      "case": "e1-4-equal-cards",
+      "description": "4: equal Epic and OLSD values have one combined current-value card",
+      "passed": true
+    },
+    {
+      "case": "e1-4-equal-cards",
+      "description": "4: a genuinely different saved value remains available as a separate card",
+      "passed": true
+    },
+    {
+      "case": "e1-4-equal-cards",
+      "description": "4: keeping matching current content creates no unnecessary import update",
+      "passed": true
+    },
+    {
+      "case": "e1-5-short-filenames",
+      "description": "5: names use screen-local time and a short number only for a collision in one plan",
+      "passed": true
+    },
+    {
+      "case": "e1-5-short-filenames",
+      "description": "5: the long unique ID remains internal rather than in the filename",
+      "passed": true
+    },
+    {
+      "case": "e1-5-short-filenames",
+      "description": "5: the warning does not incorrectly claim that the earlier value differs",
+      "passed": true
+    },
+    {
+      "case": "e1-5-short-filenames",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/a94ea42263870888d0d4d7feb3624766bd89a82c",
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/fb03e1fddcf21c95c0710275c191a954ecd5fb70",
   "commit_scope": "Tested application, browser checks, and reviewer documents; verification metadata committed separately."
 }
