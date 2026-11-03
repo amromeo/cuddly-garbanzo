@@ -1,31 +1,18 @@
-# Independent-review changes
+# Revision 6 — choose, save, approve, download
 
-## Wrong results (browser regressions 1–11)
+This redesign implements “Make it obvious to use,” reviewed against baseline 15cf047.
 
-1. Approval requires explicit decisions; it never invents Use Epic. The approval dialog shows all three values and records the exact source basis.
-2. Group review includes open Epic differences even if OLSD and proposed match. Boxes start unticked, the button counts chosen approvals, and already approved records cannot be reapproved.
-3. Open source changes and mapping blockers are independent of selected export columns.
-4. Discard restores the working copy on role-switch and reset routes; Stay restores the visible role selection.
-5. Unsaved approved edits disable downloading and explain that saving withdraws approval.
-6. Exported and Confirmed in snapshot states show dates/files; Ready to export excludes downloaded revisions. Progress follows the actual stage.
-7. An export record is created per file only when its download action is used. Merely opening/closing a chooser creates no record.
-8. Each draft/approval captures its source basis. Unexpected OLSD or Epic changes preserve drafts, invalidate affected approvals, and return fields to review, including unselected fields. An expected match to an exported value is recorded as observed confirmation.
-9. Keep current OLSD value uses current observed OLSD. Use my wording is explicit; typing selects it and retained custom differences remain discoverable.
-10. Performing-laboratory line breaks are preserved.
-11. Needs a decision, Decided, Approved changes, and Other fields are separate. Keep choices stay visible. Mapping saves report approval only when something was approved.
+- Four worklist views: To review, To approve, To download, All tests. The editor review count excludes lab-name blockers and set-aside tests. All tests has Kept wording, Set aside, Downloaded, Done, and Waiting filters.
+- Simple name/lab choices happen inline with actual old/new values. Selection covers the complete section, including unloaded rows. Bulk actions never apply to free text.
+- All choices remain browser-memory-only until Save. Save never approves. A saved batch has Undo until a later action makes undo unsafe.
+- The separate group-review page, include checkboxes, sort/page-size controls, dark sidebar, duplicate status columns, and always-on disabled action bars are removed.
+- A test asks one question with actual-value cards. Writing is offered only for names and conditions. Other catalog content stays visible with Edit actions. Up-to-date tests are normal readable catalog entries.
+- Saved changes have a separate explicit Approve action. Approval keeps exact OLSD/Epic values, dates, actor, and time. Already approved tests are not reapproved by default.
+- Downloading is one action for one or several named Excel files, with no confirmation or chooser. Each initiated file is recorded separately. The next step is to import into OLSD; sample files must not be imported into a real catalog.
+- Unexpected catalog/Epic changes return tests to review. Matching expected downloaded values make a test done. A matching snapshot remains a dated observation, not proof of real-time publication.
+- Decide later removes the test from To review after Save. A later Epic change returns it, with the prior decision and note visible. Review now can also reopen it deliberately.
+- Notes, exact unsaved before/after values, navigation warnings, line/word highlights, request-help placeholders, role guards, URLs, Back, focus handling, and administrator return links remain.
+- One sample-data strip holds the role, Reset, and demo-check controls on desktop and phone. System fonts use 15px body text and at least 13px labels; mobile targets are at least 44px.
+- Shortcuts 1/2 choose and Ctrl/Cmd+S saves. The reviewer guide is a short task list.
 
-Item 12 was absent by request.
-
-## Usability (13–20)
-
-Global search includes all statuses and clears hidden selections. Edit actions include the field. The nightly summary, change/lab filters, sorting, and paging operate on 306 sample records. Added/removed text is highlighted in comparisons, group review, approval, and exact unsaved-change dialogs. Optional decision notes, per-test history, and prior-kept source context are visible. Pure keeps finish on save. Blocked editors can note a clearly simulated administrator request. Mapping changes appear in the table and have a return link. Notifications appear away from the action bar.
-
-## Wording and accessibility (21–29)
-
-Removed promotional copy and developer terms. Use consistent Demo editor/administrator labels, full time-zone dates, age, and overdue indicators. Restore focus after rendering and dialogs. Comparisons use real table semantics; one live region reports feedback. Worklist filters use plain buttons. Essential small text and contrast were improved. Category removal cancellation, expanded category choices, URL navigation/Back/refresh, and mobile role/reset controls are covered by browser tests.
-
-## Documentation and limits
-
-The reviewer guide includes a glossary, Reset demo first, exact CBCND identity, explicit saving/discard instructions, phone controls, and a category-reconciliation scenario. Verification includes a date, the exact tested code commit, test-script URL, and file hashes. Production gaps explicitly include vendor control-column handling and approval source snapshots.
-
-The sample-data banner, visual design, exact unsaved-value comparison, prominent blocker position, deliberate name editing, named Excel downloads, approval/publication distinction, snapshot observation limits, and category-removal explanation remain.
+Automated checks measure the 2-click save, 5-click single download, and 6-click 32-name download paths. `verification.json` records the results, tested source commit, and code/test hashes. The new storage key is `olsd-workflow-prototype-v6-choose-save-20261102`.
