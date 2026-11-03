@@ -100,7 +100,7 @@ with sync_playwright() as pw:
     if ONLY in [None,'question-cards']:
         with case('question-cards') as p:
             open_test(p,'demo-tsh')
-            check(p.locator('.question').count()==1,'Test page asks one question at a time')
+            check(p.locator('.question').count()==1,'A single-change test shows its one question')
             check('TSH, Third Generation' in p.locator('[data-answer="name:epic"]').inner_text(),'Epic answer card contains the real new name')
             check('Thyroid Stimulating Hormone' in p.locator('[data-answer="name:olsd"]').inner_text(),'Keep card contains the real current catalog name')
             check(p.locator('.answer-card[aria-pressed="true"]').count()==0,'No answer is preselected')
@@ -200,7 +200,7 @@ with sync_playwright() as pw:
             p.evaluate("applySnapshot({'demo-tsh':{conditions:'Different catalog conditions'}});render();")
             check(p.evaluate("!!byId('demo-tsh').pending.conditions"),'Unselected unexpected catalog content is still a review question')
             open_test(p,'demo-tsh')
-            check(p.locator('.question').count()==1,'Multiple open changes still show one question at a time')
+            check(p.locator('.question').count()==2,'All open changes are shown together on the test page')
     if ONLY in [None,'custom-wording-and-plain-entry']:
         with case('custom-wording-and-plain-entry') as p:
             open_test(p,'demo-tsh');p.locator('[data-write="name"]').click();p.locator('#edit-name').fill('My public TSH name')
@@ -220,7 +220,7 @@ with sync_playwright() as pw:
             check(save_button(p).inner_text()=='Save','Editing a normal catalog entry uses Save, not a stray review-queue navigation')
     if ONLY in [None,'blocked-and-capabilities']:
         with case('blocked-and-capabilities') as p:
-            check(p.evaluate('stageCounts().review')==43,'Editor To review count excludes the unmapped test and deferred test')
+            check(p.evaluate('stageCounts().review')==45,'Editor To review count excludes the unmapped test and deferred test')
             check(p.locator('[data-all-filter="waiting"]').inner_text()=='1 test waiting on a lab name','Editor sees a quiet link for administrator-only work')
             open_test(p,'786513')
             check(p.locator('.blocker').is_visible() and 'KH CHEMISTRY' in p.locator('.blocker').inner_text(),'Blocked test gives a plain lab-name explanation')
@@ -257,7 +257,7 @@ with sync_playwright() as pw:
             p.screenshot(path=str(ROOT/'review-assets'/'v6-mobile.png'),full_page=True)
     if ONLY in [None,'screen-rules-and-focus']:
         with case('screen-rules-and-focus') as p:
-            check(p.locator('.change-row').first.bounding_box()['y']<450,'First change is visible well above the previous 562px starting point')
+            check(p.locator('.test-row,.change-row').first.bounding_box()['y']<450,'First change is visible well above the previous 562px starting point')
             check(p.locator('.tab').count()==4,'Only the four requested worklist tabs are present')
             check(p.locator('.rail,.stats,[data-action="group"]').count()==0,'Sidebar, repeated tiles, and separate group-review action are removed')
             check(p.locator('#role').count()==1,'There is one demo role control')
@@ -275,8 +275,8 @@ with sync_playwright() as pw:
     if ONLY in [None,'multiple-questions-and-validation']:
         with case('multiple-questions-and-validation') as p:
             p.evaluate("applySource('Epic',{'785258':{name:'New CBC display name'}});render();")
-            open_test(p,'785258');check(p.locator('.question').count()==1,'Two open changes are still presented one question at a time')
-            choose(p,'name','defer');save_button(p).click()
+            open_test(p,'785258');check(p.locator('.question').count()==2,'Two open changes are presented together on one test')
+            p.locator('[data-action="defer-rest"]').click();save_button(p).click()
             check(p.evaluate("!toReview(byId('785258')) && deferred(byId('785258'))"),'Decide later sets the whole test aside even when another change is waiting')
             p.evaluate("applySource('Epic',{'785258':{labs:'Another changed laboratory'}});refreshWorking();render();")
             check(p.evaluate("toReview(byId('785258')) && !deferred(byId('785258'))"),'A new Epic change reopens a test that was set aside for a different question')
@@ -299,7 +299,7 @@ with sync_playwright() as pw:
             check(p.evaluate("unsavedIds().length===11 && !byId('785258').decisions.labs"),'Bulk Decide later remains unsaved until Save')
             check('Decide later' in p.locator('[data-row="785258|labs"]').inner_text(),'Unsaved rows identify the chosen bulk outcome')
             save_button(p).click()
-            check(p.evaluate('stageCounts().review')==32,'Saved bulk deferral removes all 11 lab changes from To review')
+            check(p.evaluate('stageCounts().review')==34,'Saved bulk deferral removes all 11 lab changes from To review')
             check(p.evaluate('state.tests.filter(deferred).length')==12,'Bulk deferred tests remain findable with the existing set-aside record')
             check(p.evaluate('state.tests.filter(canApprove).length')==0,'Deferring a batch never approves it')
     if ONLY in [None,'save-stay-next-exit']:
@@ -375,9 +375,113 @@ with sync_playwright() as pw:
             check(p.locator('[data-action="withdraw-selected"]').inner_text()=='Withdraw approval for selected test','Selected-all withdrawal labels its exact scope')
             p.locator('[data-action="withdraw-selected"]').click()
             check(p.evaluate("byId('785260').approval===null && state.exports.length===0"),'Withdraw all removes approval without creating a download')
+    if ONLY in [None,'one-row-per-test']:
+        with case('one-row-per-test') as p:
+            check(p.evaluate('state.tests.length')==308,'Sample catalog contains 308 tests')
+            check(p.evaluate('stageCounts()')=={'review':45,'approve':0,'download':1,'all':308},'Worklist totals count tests, not the number of changed fields')
+            groups=p.locator('[data-change-group]').evaluate_all('ns=>ns.map(n=>n.dataset.changeGroup)')
+            check(groups==['multi','name','labs'],'Multiple-change tests precede single-name and single-lab groups')
+            for id in ['demo-vitd','demo-a1c']:
+                check(p.locator(f'[data-test-row="{id}"]').count()==1,'Multi-change sample '+id+' has exactly one worklist row')
+                check(p.locator(f'[data-change-group="multi"] [data-row^="{id}|"]').count()==2,'Both changed fields appear inside '+id+' row')
+                check(p.locator(f'[data-change-group="name"] [data-row^="{id}|"], [data-change-group="labs"] [data-row^="{id}|"]').count()==0,'Multi-change sample '+id+' is absent from single-field groups')
+            check('Name changes (32)' in p.locator('[data-change-group="name"] h2').inner_text(),'Single-name section excludes the two multi-change tests')
+            check('Lab changes (11)' in p.locator('[data-change-group="labs"] h2').inner_text(),'Single-lab section excludes the two multi-change tests')
+            p.locator('#search').fill('Vitamin D')
+            check(p.locator('.catalog-row').count()==1,'Global search returns a multi-change test only once')
+            p.locator('[data-test="demo-vitd"]').first.click()
+            check(p.locator('.question').count()==2,'Opening a search result shows both outstanding fields together')
+    if ONLY in [None,'multi-selection-and-bulk']:
+        with case('multi-selection-and-bulk') as p:
+            p.locator('[data-select-test="demo-vitd"]').check()
+            check(p.evaluate('[...ui.selected].sort()')==['demo-vitd|labs','demo-vitd|name'],'A test checkbox selects both eligible fields on that test')
+            check(p.locator('[data-action="bulk-epic"]').inner_text()=='Use Epic for 2 changes on 1 test','Bulk action states both field and test counts')
+            p.locator('[data-select-section="multi"]').click()
+            check(p.evaluate('ui.selected.size')==4 and p.locator('[data-select-test]:checked').count()==2,'Section Select all includes both changes on both tests')
+            p.locator('[data-select-section="multi"]').click()
+            check(p.evaluate('ui.selected.size')==0,'Section Clear selection removes every selected field')
+            p.locator('[data-select-section="multi"]').click();p.locator('[data-action="bulk-epic"]').click()
+            check(p.evaluate('unsavedIds().length')==2 and p.evaluate('state.tests.filter(canApprove).length')==0,'Bulk choices stage two tests without approving or saving')
+            check(p.locator('[data-test-row="demo-vitd"] [data-row]').count()==2,'Staged changes remain together until Save')
+            save_button(p).click()
+            check(p.evaluate("['demo-vitd','demo-a1c'].every(id=>canApprove(byId(id)) && ['name','labs'].every(k=>byId(id).decisions[k].choice==='epic'))"),'One Save records all four explicit choices')
+            check(p.evaluate('stageCounts().review')==43,'Saving two complete tests removes exactly two from To review')
+            p.locator('[data-action="undo-save"]').click()
+            check(p.evaluate("['demo-vitd','demo-a1c'].every(id=>pendingKeys(byId(id)).length===2 && !canApprove(byId(id)))"),'Undo restores both unresolved fields on both tests')
+        for outcome in ['olsd','defer']:
+            with case('multi-selection-and-bulk') as p:
+                p.locator('[data-select-test="demo-vitd"]').check();p.locator(f'[data-action="bulk-{outcome}"]').click()
+                check(p.evaluate("pendingKeys(byId('demo-vitd')).length")==2,'Bulk '+outcome+' leaves saved decisions untouched until Save')
+                save_button(p).click()
+                check(p.evaluate("!canApprove(byId('demo-vitd')) && !ready(byId('demo-vitd'))"),'Bulk '+outcome+' never creates an exportable change')
+                check(p.evaluate("retained(byId('demo-vitd'))" if outcome=='olsd' else "deferred(byId('demo-vitd'))"),'Bulk '+outcome+' remains discoverable after Save')
+    if ONLY in [None,'multi-free-text-safety']:
+        with case('multi-free-text-safety') as p:
+            p.evaluate("applySnapshot({'demo-vitd':{conditions:'New OLSD conditions requiring review'}});render();")
+            check(p.locator('[data-test-row="demo-vitd"] [data-row]').count()==3,'A third free-text change stays in the same test row')
+            check(p.locator('[data-test-row="demo-vitd"] [data-inline*="conditions"]').count()==0,'Free text never gains a bulk Epic acceptance action')
+            p.locator('[data-select-test="demo-vitd"]').check()
+            check(p.evaluate('ui.selected.size')==2,'Test selection includes only eligible name and laboratory changes')
+            p.locator('[data-action="bulk-epic"]').click();save_button(p).click()
+            check(p.evaluate("!!byId('demo-vitd').pending.conditions && !byId('demo-vitd').decisions.conditions && !canApprove(byId('demo-vitd'))"),'Bulk save leaves the free-text question open and approval unavailable')
+            p.locator('[data-test="demo-vitd"]').first.click()
+            check(p.locator('[data-question="conditions"]').is_visible(),'Remaining free-text question stays accessible for individual review')
+    if ONLY in [None,'multi-partial-save-and-export']:
+        with case('multi-partial-save-and-export') as p:
+            p.locator('[data-action="walk"]').click()
+            check(p.locator('h1').inner_text()=='Vitamin D, 25-Hydroxy','Full walkthrough starts at the first displayed multi-change test')
+            check(p.locator('.question').count()==2 and '0 of 2 chosen' in p.locator('.question-count').inner_text(),'Both questions show a clear initial decision count')
+            choose(p,'name','epic')
+            check(p.locator('.question').count()==2 and '1 of 2 chosen' in p.locator('.question-count').inner_text(),'First choice stays visible alongside the unresolved field')
+            check('1 more to choose on this test' in p.locator('.save-bar').inner_text(),'Partial choice identifies the remaining review work')
+            check(p.locator('[data-action="save-next"]').count()==0,'Save and next is withheld while another field needs a choice')
+            save_button(p).click()
+            check(p.locator('h1').inner_text()=='Vitamin D, 25-Hydroxy' and p.evaluate("toReview(byId('demo-vitd')) && !canApprove(byId('demo-vitd'))"),'Partial Save stays on the test and keeps it in To review')
+            p.reload();check(p.evaluate("byId('demo-vitd').decisions.name.choice==='epic' && !!byId('demo-vitd').pending.labs"),'Partial Save survives refresh without deciding the remaining field')
+            choose(p,'labs','epic');save_button(p).click()
+            check(p.evaluate("canApprove(byId('demo-vitd'))") and p.locator('.saved-change').count()==2,'Approval becomes available only after both choices are saved')
+            approve_one(p,'demo-vitd');wb=click_download(p,'tested-v7-multi-field.xlsx');rows=list(wb['Tests'].values);row=dict(zip(rows[0],rows[1]))
+            check(row['Test Name']=='Vitamin D 25-OH, Total','Multi-field workbook contains the explicitly accepted Epic name')
+            check('Chemistry Laboratory KOP' in str(row.get('Performing Lab','')),'Multi-field workbook contains the explicitly accepted laboratory')
+    if ONLY in [None,'selected-walkthrough-order']:
+        with case('selected-walkthrough-order') as p:
+            p.locator('[data-select-test="demo-a1c"]').check();p.locator('[data-select="demo-tsh|name"]').check()
+            p.locator('.selection-bar [data-action="walk"]').click()
+            check(p.evaluate('ui.queue')==['demo-a1c','demo-tsh'],'Selected walkthrough has one entry per test in displayed worklist order')
+            check(p.locator('h1').inner_text()=='Hemoglobin A1c','Selected walkthrough opens its first displayed test')
+            choose(p,'name','epic');choose(p,'labs','olsd');p.locator('[data-action="save-next"]').click()
+            check(p.locator('h1').inner_text()=='Thyroid Stimulating Hormone','Save and next follows the selected sequence after both decisions')
+            p.get_by_role('button',name='Previous test',exact=True).click()
+            check(p.locator('h1').inner_text()=='Hemoglobin A1c','Previous revisits a completed test in the selected sequence')
+            check(p.evaluate("byId('demo-vitd').decisions.name===undefined && byId('demo-vitd').decisions.labs===undefined"),'Walkthrough never modifies an unselected test')
+    if ONLY in [None,'multi-defer-remaining']:
+        with case('multi-defer-remaining') as p:
+            open_test(p,'demo-vitd');choose(p,'name','epic');p.locator('[data-action="defer-rest"]').click()
+            check(p.evaluate("staged.get('demo-vitd').decisions.name.choice==='epic' && staged.get('demo-vitd').decisions.labs.choice==='defer'"),'Decide later preserves a chosen field and defers only the unanswered field')
+            check(p.evaluate("!byId('demo-vitd').decisions.name"),'Deferring remaining questions is unsaved until Save')
+            save_button(p).click()
+            check(p.evaluate("deferred(byId('demo-vitd')) && !toReview(byId('demo-vitd')) && !canApprove(byId('demo-vitd'))"),'Saving remaining deferral sets the test aside without approval')
+            p.locator('[data-action="resume-review"]').click();save_button(p).click()
+            check(p.evaluate("toReview(byId('demo-vitd')) && byId('demo-vitd').decisions.name.choice==='epic'"),'Review now reopens the remaining field and preserves the earlier choice')
+    if ONLY in [None,'multi-keyboard-and-mobile']:
+        with case('multi-keyboard-and-mobile') as p:
+            open_test(p,'demo-vitd');p.keyboard.press('1')
+            check(p.evaluate("staged.get('demo-vitd').decisions.name.choice==='epic' && !staged.get('demo-vitd').decisions.labs"),'Shortcut 1 decides only the first unanswered field')
+            p.keyboard.press('2')
+            check(p.evaluate("staged.get('demo-vitd').decisions.labs.choice==='olsd'"),'Shortcut 2 moves to the next unanswered field')
+            check(p.locator('.question').count()==2,'Keyboard decisions keep both fields visible before Save')
+        with case('multi-keyboard-and-mobile',{'width':390,'height':844}) as p:
+            check(p.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Multi-change worklist fits a phone without horizontal scrolling')
+            p.locator('[data-select-test="demo-vitd"]').check()
+            check(p.locator('[data-select-test="demo-vitd"]').evaluate('n=>n===document.activeElement'),'Test selection retains keyboard focus')
+            p.locator('[data-select-test="demo-vitd"]').uncheck();p.locator('[data-test="demo-vitd"]').first.click()
+            check(p.locator('.question').count()==2 and p.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Both multi-change questions fit on a phone')
+            choose(p,'name','epic');choose(p,'labs','olsd')
+            check(p.locator('[data-action="save"]').is_visible() and p.locator('[data-action="save-exit"]').is_visible(),'Phone keeps Save and Save and exit available for multi-change tests')
+            p.screenshot(path=str(ROOT/'review-assets'/'v7-multi-mobile.png'),full_page=True)
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:
-    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Make it obvious to use; reviewed baseline 15cf047','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v6-choose-save-20261102','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
+    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'One row per test; patch applied to baseline 96184ae','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Awaiting separate one-row-per-test instructions, including section 6; linked artifact supplies patch only.','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
     (ROOT/'verification.json').write_text(json.dumps(report,indent=2))
 print(json.dumps({'case':ONLY or 'all','passed':len(checks),'click_targets':metrics,'browser_errors':errors},indent=2))
