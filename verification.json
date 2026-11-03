@@ -1,18 +1,18 @@
 {
-  "verified_at": "2026-11-03T04:06:52.174713+00:00",
-  "review": "Make it obvious to use; reviewed baseline 15cf047",
-  "commit": "144bb1fd5b1477e0582a7443b39a488074aa7515",
+  "verified_at": "2026-11-03T15:23:26.833036+00:00",
+  "review": "Follow-up bulk choices, editor navigation/save, and selected approval/download actions",
+  "commit": "337ece1207e8d1a80ef4f1c02eeed91dbe3ea468",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 127,
+  "passed": 172,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
-    "32_name_changes_to_download_clicks": 6,
+    "32_name_changes_to_download_clicks": 7,
     "simple_choice_to_saved_clicks": 2
   },
   "storage_key": "olsd-workflow-prototype-v6-choose-save-20261102",
-  "source_sha256": "d9a32100dfe79beee635b9a30ac865fe42ba760182ba7f328e242071c482d93a",
-  "test_script_sha256": "7a02b38f04d333961fd77614868572698b3afeba7b6dc1c454e2bf39c4bdb076",
+  "source_sha256": "7dbf589036dbf5dd18d6a4a2a8c7343f125409757b40cb4871502a7817e2e67c",
+  "test_script_sha256": "113b8e5b081ac05c407c619c483cdc749fed639dea426ef063f79ecf2012e47f",
   "checks": [
     {
       "case": "five-click-flow",
@@ -75,47 +75,47 @@
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "Select all includes the whole 32-name section, not just rendered rows",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "Bulk action clearly names its number of choices",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "Bulk choice stages 32 choices without saving them",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "Bulk selection never silently persists choices",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "Save creates 32 updates waiting for their own approval",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "Approval page states the exact batch count",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "One named workbook contains all 32 accepted names and the header",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
-      "description": "32 name changes reach a file in exactly six clicks",
+      "case": "seven-click-bulk",
+      "description": "32 name changes reach a file in seven clicks including explicit approval selection",
       "passed": true
     },
     {
-      "case": "six-click-bulk",
+      "case": "seven-click-bulk",
       "description": "Downloaded batch records precisely the approved 32 tests",
       "passed": true
     },
@@ -216,7 +216,7 @@
     },
     {
       "case": "save-next-and-shortcuts",
-      "description": "Another waiting test makes Save and next the primary action",
+      "description": "Save stays primary and Save and next is available separately",
       "passed": true
     },
     {
@@ -645,12 +645,236 @@
       "passed": true
     },
     {
-      "case": "multiple-questions-and-validation",
+      "case": "bulk-keep-and-later",
+      "description": "Bulk keep uses the requested OLSD wording",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Bulk selection offers Decide later alongside Epic and Keep",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Bulk keep stages every selected choice without saving",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Save records all 32 deliberate keeps",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Bulk keeps that change nothing require no approval",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Bulk Decide later remains unsaved until Save",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Unsaved rows identify the chosen bulk outcome",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Saved bulk deferral removes all 11 lab changes from To review",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Bulk deferred tests remain findable with the existing set-aside record",
+      "passed": true
+    },
+    {
+      "case": "bulk-keep-and-later",
+      "description": "Deferring a batch never approves it",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Review page offers Save, Save and next, and Save and exit separately",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Save stays on the same test",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Save persists the choice without approving it",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Save and exit returns to the worklist",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Save and exit preserves the choice and clears only unsaved work",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Failed validation cannot exit the editor without saving",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Save and exit explains an invalid value instead of navigating away",
+      "passed": true
+    },
+    {
+      "case": "save-stay-next-exit",
+      "description": "Invalid Save and continue also stays in the editor",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "First test shows a clear unavailable Previous control",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Previous remains available after the prior test has been saved",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Previous returns to the saved test, not only undecided tests",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Next returns to the same review sequence",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Individual keep card uses the requested wording",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Brand navigation warns about unsaved choices",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Stay cancels brand navigation and preserves the editor",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Canceling home navigation restores focus to the brand link",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Clickable brand returns to the main worklist",
+      "passed": true
+    },
+    {
+      "case": "previous-and-home",
+      "description": "Discard through the home link does not save a choice",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Approval checkboxes start unticked",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Bulk approval is unavailable until a selection is made",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Bulk approval names only the selected subset",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Approving a subset leaves unchecked tests unapproved",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Sending back a subset preserves other tests\u2019 approvals",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Approval Select all checks the full list",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Selected-all action clearly says all tests will return to review",
+      "passed": true
+    },
+    {
+      "case": "approval-selection-actions",
+      "description": "Send all back returns both saved updates to review",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Download checkboxes start unticked",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Download does not silently include the whole list",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Download contains only the selected test",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Unchecked tests stay approved and waiting to download",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Withdrawing a subset preserves the unchecked approval",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Withdrawal returns the saved choice to To approve",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Download Select all checks every ready test",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Selected-all withdrawal labels its exact scope",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
+      "description": "Withdraw all removes approval without creating a download",
+      "passed": true
+    },
+    {
+      "case": "download-selection-actions",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/144bb1fd5b1477e0582a7443b39a488074aa7515",
-  "commit_scope": "Exact tested application and check script; verification is recorded in a following commit.",
-  "sample_records": 306
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/337ece1207e8d1a80ef4f1c02eeed91dbe3ea468",
+  "commit_scope": "Tested application, browser checks, and reviewer documentation; verification metadata committed separately."
 }
