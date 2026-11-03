@@ -1,0 +1,4 @@
+# Institutional query text and credentials belong outside public commits.
+*.sql
+.Renviron
+.Renviron.*
