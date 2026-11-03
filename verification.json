@@ -1,9 +1,9 @@
 {
-  "verified_at": "2026-11-03T16:31:01.025765+00:00",
+  "verified_at": "2026-11-03T16:47:19.912020+00:00",
   "review": "One row per test; patch applied to baseline 96184ae",
-  "commit": "010b51fdaa08a785181eb0d26932a6287b892351",
+  "commit": "1646a8f1278904611ff62c0ac24487bcbb260a63",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 231,
+  "passed": 247,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
@@ -13,9 +13,9 @@
   "storage_key": "olsd-workflow-prototype-v7-test-by-test-20261103",
   "sample_count": 308,
   "patch_baseline": "96184ae",
-  "requested_checklist_status": "Awaiting separate one-row-per-test instructions, including section 6; linked artifact supplies patch only.",
-  "source_sha256": "7a6f69713c3330dce5e5c963b46c4fe5e03e2b1ed12059da1af5c50346e75b77",
-  "test_script_sha256": "58e41db04d8f469457f64b348a6573419413642b2203f75c14beb3a7bf10fee3",
+  "requested_checklist_status": "All section 6 checks included and passed.",
+  "source_sha256": "04dfe35efd4c7cf5bfda68e7e55b81d3bdb1363e6500b2a50b98fcc451768090",
+  "test_script_sha256": "67a67f6671d1bf60dfcaa2d608d0901be5429831ede126d952a0b6e963c59a93",
   "checks": [
     {
       "case": "five-click-flow",
@@ -884,6 +884,11 @@
     },
     {
       "case": "one-row-per-test",
+      "description": "Section counts add up to the To review tab count",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
       "description": "Multiple-change tests precede single-name and single-lab groups",
       "passed": true
     },
@@ -925,6 +930,11 @@
     {
       "case": "one-row-per-test",
       "description": "Single-lab section excludes the two multi-change tests",
+      "passed": true
+    },
+    {
+      "case": "one-row-per-test",
+      "description": "Every loaded test has exactly one row across all review sections",
       "passed": true
     },
     {
@@ -1069,6 +1079,11 @@
     },
     {
       "case": "multi-partial-save-and-export",
+      "description": "Partial Save moves the test to its one remaining change section",
+      "passed": true
+    },
+    {
+      "case": "multi-partial-save-and-export",
       "description": "Partial Save survives refresh without deciding the remaining field",
       "passed": true
     },
@@ -1139,7 +1154,22 @@
     },
     {
       "case": "multi-keyboard-and-mobile",
+      "description": "Shortcut hints follow only the first unanswered change",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
       "description": "Shortcut 2 moves to the next unanswered field",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Shortcut hints disappear when every multi-change question has a choice",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Extra numeric keys do not alter a completed multi-change review",
       "passed": true
     },
     {
@@ -1150,6 +1180,11 @@
     {
       "case": "multi-keyboard-and-mobile",
       "description": "Multi-change worklist fits a phone without horizontal scrolling",
+      "passed": true
+    },
+    {
+      "case": "multi-keyboard-and-mobile",
+      "description": "Phone field labels stack above their values",
       "passed": true
     },
     {
@@ -1168,12 +1203,57 @@
       "passed": true
     },
     {
-      "case": "multi-keyboard-and-mobile",
+      "case": "screen-order-and-other-fields",
+      "description": "Next follows the second test displayed in the multi-change section",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "Next crosses into the name section in screen order with the correct position",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "Previous reverses the displayed test order",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "A non-name/lab field uses the individual-review prompt even when Epic has a value",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "Untouched multi-change lines are not marked Unsaved",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "Only the line with a new choice is marked Unsaved",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "An Other changes row names its outstanding field",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "A free-text-only test can be selected for walkthrough without bulk acceptance",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
+      "description": "Selected free-text test opens individually for review",
+      "passed": true
+    },
+    {
+      "case": "screen-order-and-other-fields",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_scope": "Locally tested source, browser checks, and reviewer documentation; verification metadata committed separately.",
-  "publication_status": "Not published; awaiting separate section 6 checklist.",
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/1646a8f1278904611ff62c0ac24487bcbb260a63",
+  "commit_scope": "Tested application, browser checks, and review documents; verification metadata committed separately.",
   "patch_artifact": "https://claude.ai/public/artifacts/370408b0-b24f-4927-9ee5-f575303a6bfc"
 }
