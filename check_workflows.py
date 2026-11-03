@@ -891,6 +891,68 @@ with sync_playwright() as pw:
             open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-readable-name.xlsx')
             filename=p.evaluate('state.exports[0].fileName');check(len(filename)<60 and len(p.evaluate('state.exports[0].id'))>30,'5: the long unique ID remains internal rather than in the filename')
             p.locator('[data-change-choice="name"]').click();check("You already downloaded a file for this test. It's out of date, so don't import it." in p.locator('.download-warning').inner_text(),'5: the warning does not incorrectly claim that the earlier value differs')
+    if ONLY in [None,'b-entry-notes']:
+        for field in ['name','conditions']:
+            with case('b-entry-notes') as p:
+                open_test(p,'sample-1');p.locator(f'[data-edit-field="{field}"]').click()
+                check(p.locator(f'[data-toggle-note="{field}"]').count()==0 and p.locator(f'#note-{field}').count()==0,'Unchanged '+field+' offers no note-only choice')
+                p.keyboard.press('Control+s')
+                check(p.evaluate("Object.keys(byId('sample-1').decisions).length===0"),'Saving unchanged '+field+' creates no empty choice')
+                p.locator(f'#edit-{field}').fill('First revised wording')
+                check(p.locator(f'[data-toggle-note="{field}"]').is_visible(),'Changed '+field+' offers Add a note under Edit')
+                p.locator(f'[data-toggle-note="{field}"]').click();p.locator(f'#note-{field}').fill('Reason for this wording')
+                p.locator(f'#edit-{field}').fill('Final revised wording')
+                check(p.locator(f'#note-{field}').input_value()=='Reason for this wording','Unsaved '+field+' note stays while wording changes')
+                check(p.evaluate("Object.keys(byId('sample-1').decisions).length===0"),'Typing '+field+' and a note does not save')
+                save_button(p).click()
+                check(p.evaluate("k => {const t=byId('sample-1');return t.proposed[k]==='Final revised wording' && t.decisions[k].choice==='custom' && t.decisions[k].note==='Reason for this wording' && !t.approval;}",field),'Save keeps '+field+' wording and note without approving')
+                p.locator(f'[data-change-choice="{field}"]').click();p.locator(f'#edit-{field}').fill('Another revision')
+                check(p.locator(f'#note-{field}').input_value()=='' and 'Earlier note: Reason for this wording' in p.locator('.earlier-note').inner_text(),'Changing saved '+field+' wording clears the saved note and shows Earlier note')
+                p.locator(f'#note-{field}').fill('New unsaved reason');p.locator(f'#edit-{field}').fill('One more revision')
+                check(p.locator(f'#note-{field}').input_value()=='New unsaved reason','A newly typed '+field+' note survives further edits')
+    if ONLY in [None,'b-single-card-number']:
+        with case('b-single-card-number') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click()
+            p.evaluate("applySnapshot({'demo-tsh':{name:byId('demo-tsh').epic.name}});refreshWorking();render();")
+            card=p.locator('[data-answer="name:olsd"]')
+            check(p.locator('.answer-card').count()==1 and card.locator('.shortcut').inner_text()=='1','The sole Keep OLSD answer card is numbered 1')
+            check(card.get_attribute('aria-pressed')=='false','The sole card starts unselected')
+            p.keyboard.press('1')
+            check(card.get_attribute('aria-pressed')=='true' and p.evaluate("!byId('demo-tsh').decisions.name"),'Shortcut 1 chooses the sole card without saving')
+            save_button(p).click()
+            check(p.evaluate("!canApprove(byId('demo-tsh')) && !byId('demo-tsh').approval && state.exports.length===0"),'Keeping OLSD finishes on Save without approval or a file')
+        with case('b-single-card-number') as p:
+            open_test(p,'demo-tsh')
+            check(p.locator('[data-answer="name:epic"] .shortcut').inner_text()=='1' and p.locator('[data-answer="name:olsd"] .shortcut').inner_text()=='2','Two distinct answer cards retain numbers 1 and 2')
+    if ONLY in [None,'b-mismatch-positions']:
+        ids=['demo-tsh','demo-crp','sample-10','sample-20','sample-30']
+        observations=[]
+        for position in [0,2,4]:
+            with case('b-mismatch-positions') as p:
+                for id in ids:
+                    open_test(p,id);choose(p,'name','epic');save_button(p).click();approve_one(p,id)
+                p.goto(BASE+'/#/worklist?tab=download')
+                for id in ids:p.locator(f'[data-download-select="{id}"]').check()
+                click_download(p,f'tested-b-mismatch-{position}.xlsx')
+                check(p.evaluate('state.exports.length===1 && state.exports[0].tests.length===5'),'One file contains all five approved tests')
+                mismatched=ids[position]
+                p.evaluate("""({ids,mismatched}) => {
+                    const updates=Object.fromEntries(ids.map(id=>[id,{name:id===mismatched?'Sample different catalog value':byId(id).proposed.name}]));
+                    applySnapshot(updates);refreshWorking();render();
+                }""",{'ids':ids,'mismatched':mismatched})
+                status=p.evaluate("""ids => ids.map(id=>({id,confirmed:confirmed(byId(id)),review:toReview(byId(id)),pending:byId(id).pending.name||null}))""",ids)
+                p.locator('[data-nav="downloads"]').click()
+                row=p.locator('[data-export-id]').first
+                observations.append((position,mismatched,status,row.inner_text(),p.evaluate('id=>byId(id).title',mismatched)))
+        # Assert matching rows first, after exercising all three positions in fresh contexts.
+        for position,mismatched,status,text,title in observations:
+            for t in status:
+                if t['id']!=mismatched:
+                    check(t['confirmed'] and not t['review'] and not t['pending'],f'Mismatch position {position+1}: matching test {t["id"]} is confirmed, stays out of To review, and has no open name change')
+            t=next(t for t in status if t['id']==mismatched)
+            check(t['review'] and t['pending'] and t['pending']['source']=='OLSD',f'Mismatch position {position+1}: differing test returns to To review with an OLSD name change')
+            check('Do not import' not in text,f'Mismatch position {position+1}: Downloads does not mark the file Do not import')
+            check(title in text,f'Mismatch position {position+1}: Downloads names the test that differs')
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:
