@@ -1,9 +1,9 @@
 {
-  "verified_at": "2026-11-03T18:44:22.003319+00:00",
-  "review": "Next fixes reviewed at 32260a9: consolidated saved changes, confirmation, cancel and source wording",
-  "commit": "9a6eb5ed5ef4828b10284bdc64edef0260d28f38",
+  "verified_at": "2026-11-03T19:56:36.118340+00:00",
+  "review": "Next fixes reviewed at 138948c: deferral, retired downloads, note provenance and approval guidance",
+  "commit": "a94ea42263870888d0d4d7feb3624766bd89a82c",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 336,
+  "passed": 379,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
@@ -13,10 +13,10 @@
   "storage_key": "olsd-workflow-prototype-v7-test-by-test-20261103",
   "sample_count": 308,
   "patch_baseline": "96184ae",
-  "requested_checklist_status": "Browser checks cover all requested items 1\u20135 and the walk, carry and wording changes; previous workflow regressions retained.",
-  "review_baseline": "32260a9",
-  "source_sha256": "b3ba25f660f5076fda55072ec2e2286305fa7708c5e1ebbbf0da537de396d8ea",
-  "test_script_sha256": "3439f282c0eb118145f0a859045d6c8dc9507878b126d98ef6730a02959ed028",
+  "requested_checklist_status": "Browser checks cover all requested items 1\u20134 and the small fixes; earlier workflow regressions retained.",
+  "review_baseline": "138948c",
+  "source_sha256": "aabb68e1ded8513b7f028134be75819d6ad3cbae24b1cf97d8c00cb258ef3d7b",
+  "test_script_sha256": "c934dde89cf1eb19f197f905433c152ddbbd1db8fb59a5e5fe2a2cd66656abe5",
   "checks": [
     {
       "case": "five-click-flow",
@@ -1694,11 +1694,226 @@
       "passed": true
     },
     {
-      "case": "once-6-8-walk-carry-and-wording",
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: Decide later restores the Epic change and resets the proposal to OLSD after olsd save",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: reopened deferral is discoverable and cannot be approved",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: saved deferral remains Set aside after reload",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: Decide later restores the Epic change and resets the proposal to OLSD after epic save",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: reopened deferral is discoverable and cannot be approved",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: saved deferral remains Set aside after reload",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: Decide later restores the Epic change and resets the proposal to OLSD after epic approval",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: reopened deferral is discoverable and cannot be approved",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: saved deferral remains Set aside after reload",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: an authored edit with no Epic difference does not offer Decide later",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: loading a legacy broken olsd deferral restores its pending state without approval",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: legacy recovery preserves the reviewer\u2019s saved reason",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: loading a legacy broken epic deferral restores its pending state without approval",
+      "passed": true
+    },
+    {
+      "case": "retire-1-defer-reopened-change",
+      "description": "1: legacy recovery preserves the reviewer\u2019s saved reason",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: Change after download shows the earlier-file warning",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: Cancel without saving keeps the approved file valid",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: saving a rejection retires the old file and removes its import prompt",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: outdated history files cannot be downloaded again or presented for import",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: a later snapshot of the rejected file actually returns the test to review",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: withdrawing approval retires its file and shows the warning",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: importing a withdrawn file also returns the test to review on a later check",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: retiring one row returns unaffected approved tests to To download for a clean file",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: mixed-file history identifies the affected test and clean-file replacements",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: a clean replacement workbook contains only the selected unaffected test",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: separate downloads receive unique timestamped filenames",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: the new import prompt names only the current file",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: cancelling Change keeps the newest valid file usable even with older retired files",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: cancelled edits do not retire or obscure the newest approved file",
+      "passed": true
+    },
+    {
+      "case": "retire-2-download-lifecycle",
+      "description": "2: stale-file status survives a reload alongside the new valid file",
+      "passed": true
+    },
+    {
+      "case": "retire-3-choice-notes",
+      "description": "3: changing a choice clears its note and offers it as Earlier note",
+      "passed": true
+    },
+    {
+      "case": "retire-3-choice-notes",
+      "description": "3: approval never inherits the earlier choice note and History retains it",
+      "passed": true
+    },
+    {
+      "case": "retire-3-choice-notes",
+      "description": "3: changing confirmed wording also clears and displays its earlier note",
+      "passed": true
+    },
+    {
+      "case": "retire-3-choice-notes",
+      "description": "3: new wording approval contains no inherited sample note, which remains in History",
+      "passed": true
+    },
+    {
+      "case": "retire-3-choice-notes",
+      "description": "3: a deliberately entered replacement note is included in approval",
+      "passed": true
+    },
+    {
+      "case": "retire-4-waiting-for-approval",
+      "description": "4: partly saved test explains the missing approval and names its open field",
+      "passed": true
+    },
+    {
+      "case": "retire-4-waiting-for-approval",
+      "description": "4: approval remains unavailable while a field awaits a decision",
+      "passed": true
+    },
+    {
+      "case": "retire-4-waiting-for-approval",
+      "description": "4: partly saved test explains the missing approval and names its set-aside field",
+      "passed": true
+    },
+    {
+      "case": "retire-4-waiting-for-approval",
+      "description": "4: approval remains unavailable while a field awaits a decision",
+      "passed": true
+    },
+    {
+      "case": "retire-5-small-fixes",
+      "description": "5: an unchanged test has no standalone Other fields heading",
+      "passed": true
+    },
+    {
+      "case": "retire-5-small-fixes",
+      "description": "5: carried sole choice returns to its list without a dialog and retains Save",
+      "passed": true
+    },
+    {
+      "case": "retire-5-small-fixes",
+      "description": "5: browser Back also returns a carried choice to its original list without saving",
+      "passed": true
+    },
+    {
+      "case": "retire-5-small-fixes",
+      "description": "5: ordinary editor changes still warn before returning to the list",
+      "passed": true
+    },
+    {
+      "case": "retire-5-small-fixes",
+      "description": "5: all-caught-up text counts tests rather than changes",
+      "passed": true
+    },
+    {
+      "case": "retire-5-small-fixes",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/9a6eb5ed5ef4828b10284bdc64edef0260d28f38",
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/a94ea42263870888d0d4d7feb3624766bd89a82c",
   "commit_scope": "Tested application, browser checks, and reviewer documents; verification metadata committed separately."
 }
