@@ -653,7 +653,7 @@ with sync_playwright() as pw:
         with case('once-2-confirmed-status') as p:
             open_test(p,'785260');click_download(p,'tested-confirmed-once.xlsx')
             p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":match"]').click();open_test(p,'785260')
-            check(p.locator('.saved-choices h2').inner_text()=='Confirmed in OLSD' and '2026' in p.locator('.confirmation-date').inner_text(),'2: confirmed test explicitly shows confirmation and its date')
+            check(p.locator('.saved-choices h2').inner_text().startswith('Confirmed in OLSD') and '2026' in p.locator('.confirmation-date').inner_text(),'2: confirmed test explicitly shows confirmation and its date')
             check(p.locator('[data-confirmed-choice="conditions"]').count()==1 and p.locator('.saved-choices [data-change-choice]').count()==0,'2: confirmed field has no Change button')
             check('Kept' not in p.locator('.saved-choices').inner_text(),'2: confirmed import is not mislabeled Kept')
             p.locator('[data-edit-field="conditions"]').click();p.locator('#edit-conditions').fill('New change after confirmation');save_button(p).click()
@@ -702,7 +702,7 @@ with sync_playwright() as pw:
             p.locator('[data-inline="demo-tsh|name|epic"]').click();p.locator('[data-test="demo-tsh"]').first.click()
             check(p.locator('[role="dialog"]').count()==0 and p.evaluate('dirtyNow()') and not p.evaluate("byId('demo-tsh').decisions.name"),'7: opening the sole unsaved test carries the choice without saving or a dialog')
             check(p.locator('[data-answer="name:epic"]').get_attribute('aria-pressed')=='true','7: carried choice remains selected in the test editor')
-            p.locator('[data-action="back-worklist"]').click();p.get_by_role('dialog').get_by_role('button',name='Discard',exact=True).click()
+            p.locator('[data-action="back-worklist"]').click();p.locator('[data-action="discard"]').click()
             for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
             p.locator('[data-test="demo-tsh"]').first.click()
             check(p.get_by_role('dialog').is_visible(),'7: opening a test still warns when other tests have unsaved choices')
@@ -713,9 +713,109 @@ with sync_playwright() as pw:
             open_test(p,'demo-ferritin');check(p.locator('[data-set-aside="name"] [data-change-choice]').inner_text()=='Decide now' and p.locator('[data-action="resume-review"]').count()==0,'8: set-aside fields offer Decide now without a duplicate Review now action')
             p.locator('[data-nav="worklist"]').click();p.locator('[data-tab="all"]').click();p.locator('#all-filter').select_option('later')
             check(p.locator('.catalog-row').inner_text().count('Set aside')==1,'8: a Set aside row says Set aside only once')
+    if ONLY in [None,'retire-1-defer-reopened-change']:
+        for choice,approve in [('olsd',False),('epic',False),('epic',True)]:
+            with case('retire-1-defer-reopened-change') as p:
+                open_test(p,'785258');choose(p,'labs',choice);save_button(p).click()
+                if approve:approve_one(p,'785258')
+                p.locator('[data-change-choice="labs"]').click();choose(p,'labs','defer');save_button(p).click()
+                check(p.evaluate("deferred(byId('785258')) && !!byId('785258').pending.labs && byId('785258').proposed.labs===byId('785258').olsd.labs"),'1: Decide later restores the Epic change and resets the proposal to OLSD after '+choice+(' approval' if approve else ' save'))
+                check(p.locator('[data-set-aside="labs"] [data-change-choice]').inner_text()=='Decide now' and not p.evaluate("canApprove(byId('785258')) || approved(byId('785258'))"),'1: reopened deferral is discoverable and cannot be approved')
+                p.reload();check(p.evaluate("matches(byId('785258'),'later') && !matches(byId('785258'),'approve')"),'1: saved deferral remains Set aside after reload')
+        with case('retire-1-defer-reopened-change') as p:
+            open_test(p,'sample-1');p.locator('[data-edit-field="name"]').click();p.locator('#edit-name').fill('Our authored sample name');save_button(p).click();p.locator('[data-change-choice="name"]').click()
+            check(p.locator('[data-answer="name:defer"],[data-action="defer-rest"]').count()==0,'1: an authored edit with no Epic difference does not offer Decide later')
+        for previous in ['olsd','epic']:
+            with case('retire-1-defer-reopened-change') as p:
+                open_test(p,'785258');choose(p,'labs',previous);save_button(p).click()
+                if previous=='epic':approve_one(p,'785258')
+                p.evaluate("const t=byId('785258');t.decisions.labs.choice='defer';t.decisions.labs.note='Preserve this saved reason';delete t.pending.labs;persist();")
+                p.reload()
+                check(p.evaluate("deferred(byId('785258')) && byId('785258').proposed.labs===byId('785258').olsd.labs && !canApprove(byId('785258')) && !approved(byId('785258'))"),'1: loading a legacy broken '+previous+' deferral restores its pending state without approval')
+                check(p.evaluate("byId('785258').decisions.labs.note")=='Preserve this saved reason','1: legacy recovery preserves the reviewer’s saved reason')
+    if ONLY in [None,'retire-2-download-lifecycle']:
+        with case('retire-2-download-lifecycle') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-retired-single.xlsx');old=p.evaluate('state.exports[0].id')
+            p.locator('[data-change-choice="name"]').click()
+            check("Don't import it. If it was already imported, a later catalog check will return this test to review." in p.locator('.download-warning').inner_text(),'2: Change after download shows the earlier-file warning')
+            p.locator('[data-cancel-choice="name"]').click()
+            check(not p.evaluate('fileOutdated(state.exports[0])'),'2: Cancel without saving keeps the approved file valid')
+            p.locator('[data-change-choice="name"]').click();choose(p,'name','olsd');save_button(p).click()
+            check(p.locator('.import-next').count()==0 and p.evaluate('fileOutdated(state.exports[0])'),'2: saving a rejection retires the old file and removes its import prompt')
+            p.locator('[data-nav="downloads"]').click();row=p.locator(f'[data-export-id="{old}"]')
+            check('Out of date. Do not import.' in row.inner_text() and row.locator('[data-redownload]').count()==0,'2: outdated history files cannot be downloaded again or presented for import')
+            p.locator('#role').select_option('admin');row.locator('.admin-comparison > summary').click();row.locator('[data-reconcile$=":match"]').click()
+            check(p.evaluate("toReview(byId('demo-tsh')) && !!byId('demo-tsh').pending.name"),'2: a later snapshot of the rejected file actually returns the test to review')
+        with case('retire-2-download-lifecycle') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-retired-withdraw.xlsx')
+            p.locator('[data-withdraw="demo-tsh"]').click()
+            check(p.evaluate('fileOutdated(state.exports[0])') and p.locator('.import-next').count()==0 and p.locator('.download-warning').is_visible(),'2: withdrawing approval retires its file and shows the warning')
+            p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":match"]').click()
+            check(p.evaluate("toReview(byId('demo-tsh'))"),'2: importing a withdrawn file also returns the test to review on a later check')
+        with case('retire-2-download-lifecycle') as p:
+            for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to approvals',exact=True).click();p.locator('[data-action="select-all-approvals"]').click();p.locator('[data-action="approve-all"]').click();click_download(p,'tested-retired-batch.xlsx');old=p.evaluate('state.exports[0].id')
+            open_test(p,'demo-tsh');p.locator('[data-change-choice="name"]').click();choose(p,'name','olsd');save_button(p).click()
+            check(p.evaluate("ready(byId('demo-crp')) && approved(byId('demo-crp')) && fileOutdated(state.exports[0])"),'2: retiring one row returns unaffected approved tests to To download for a clean file')
+            p.locator('[data-nav="downloads"]').click();row=p.locator(f'[data-export-id="{old}"]')
+            check('Thyroid Stimulating Hormone' in row.inner_text() and 'C-Reactive Protein' in row.inner_text() and 'clean file' in row.inner_text(),'2: mixed-file history identifies the affected test and clean-file replacements')
+            p.goto(BASE+'/#/worklist?tab=download');p.locator('[data-download-select="demo-crp"]').check();wb=click_download(p,'tested-clean-replacement.xlsx')
+            check(len(list(wb['Tests'].values))==2,'2: a clean replacement workbook contains only the selected unaffected test')
+        with case('retire-2-download-lifecycle') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-name-version1.xlsx');first=p.evaluate('state.exports[0].fileName')
+            p.locator('[data-change-choice="name"]').click();p.locator('[data-write="name"]').click();p.locator('#edit-name').fill('TSH approved version two');save_button(p).click();approve_one(p,'demo-tsh');click_download(p,'tested-name-version2.xlsx')
+            names=p.evaluate('state.exports.map(x=>x.fileName)')
+            check(len(set(names))==2 and all('2026' in n for n in names),'2: separate downloads receive unique timestamped filenames')
+            check(first not in p.locator('.import-next').inner_text(),'2: the new import prompt names only the current file')
+            p.locator('[data-change-choice="name"]').click();p.locator('[data-cancel-choice="name"]').click()
+            check(p.locator('.download-warning').count()==0 and not p.evaluate('fileOutdated(state.exports[1])'),'2: cancelling Change keeps the newest valid file usable even with older retired files')
+            check(p.evaluate("currentExport(byId('demo-tsh')).id===state.exports[1].id"),'2: cancelled edits do not retire or obscure the newest approved file')
+            p.reload();p.locator('[data-nav="downloads"]').click()
+            check(p.locator('.download-record .outdated-file').count()==1,'2: stale-file status survives a reload alongside the new valid file')
+    if ONLY in [None,'retire-3-choice-notes']:
+        with case('retire-3-choice-notes') as p:
+            note='KOP is not running this test yet'
+            open_test(p,'785258');choose(p,'labs','olsd');p.locator('[data-toggle-note="labs"]').click();p.locator('#note-labs').fill(note);save_button(p).click();p.locator('[data-change-choice="labs"]').click();choose(p,'labs','epic')
+            check(p.locator('#note-labs').input_value()=='' and note in p.locator('.earlier-note').inner_text(),'3: changing a choice clears its note and offers it as Earlier note')
+            save_button(p).click();approve_one(p,'785258')
+            check(p.evaluate("byId('785258').approval.decisions.labs.note")=='' and p.evaluate("byId('785258').history.some(h=>h.note==='KOP is not running this test yet')"),'3: approval never inherits the earlier choice note and History retains it')
+        with case('retire-3-choice-notes') as p:
+            open_test(p,'785260');click_download(p,'tested-note-confirmation.xlsx');p.locator('#role').select_option('admin');p.locator('[data-nav="downloads"]').click();p.locator('.admin-comparison > summary').click();p.locator('[data-reconcile$=":match"]').click();open_test(p,'785260')
+            p.locator('[data-edit-field="conditions"]').click();p.locator('#edit-conditions').fill('New post-confirmation conditions')
+            check(p.locator('#note-conditions').input_value()=='' and 'Laboratory-approved sample wording' in p.locator('.earlier-note').inner_text(),'3: changing confirmed wording also clears and displays its earlier note')
+            save_button(p).click();approve_one(p,'785260')
+            check(p.evaluate("byId('785260').approval.decisions.conditions.note")=='' and p.evaluate("byId('785260').history.some(h=>h.note==='Laboratory-approved sample wording')"),'3: new wording approval contains no inherited sample note, which remains in History')
+        with case('retire-3-choice-notes') as p:
+            open_test(p,'785258');choose(p,'labs','olsd');p.locator('[data-toggle-note="labs"]').click();p.locator('#note-labs').fill('Earlier reason');save_button(p).click();p.locator('[data-change-choice="labs"]').click();choose(p,'labs','epic');p.locator('#note-labs').fill('Reviewed and ready to add KOP');save_button(p).click();approve_one(p,'785258')
+            check(p.evaluate("byId('785258').approval.decisions.labs.note")=='Reviewed and ready to add KOP','3: a deliberately entered replacement note is included in approval')
+    if ONLY in [None,'retire-4-waiting-for-approval']:
+        for defer in [False,True]:
+            with case('retire-4-waiting-for-approval') as p:
+                open_test(p,'demo-vitd');choose(p,'name','epic')
+                if defer:p.locator('[data-action="defer-rest"]').click()
+                save_button(p).click()
+                text=p.locator('.approval-waiting').inner_text()
+                check('This test can be approved after every change has a choice.' in text and 'Performing laboratories' in text,'4: partly saved test explains the missing approval and names its '+('set-aside' if defer else 'open')+' field')
+                check(p.locator('[data-approve]').count()==0 and not p.evaluate("canApprove(byId('demo-vitd'))"),'4: approval remains unavailable while a field awaits a decision')
+    if ONLY in [None,'retire-5-small-fixes']:
+        with case('retire-5-small-fixes') as p:
+            open_test(p,'sample-1');check(p.locator('.catalog-entry h2').count()==0,'5: an unchanged test has no standalone Other fields heading')
+        with case('retire-5-small-fixes') as p:
+            p.locator('[data-inline="demo-tsh|name|epic"]').click();p.locator('[data-test="demo-tsh"]').first.click();p.locator('[data-action="back-worklist"]').click()
+            check(p.locator('[role="dialog"]').count()==0 and p.evaluate('dirtyNow()') and p.locator('[data-action="save"]').is_visible(),'5: carried sole choice returns to its list without a dialog and retains Save')
+            p.locator('[data-test="demo-tsh"]').first.click();p.go_back()
+            check(p.locator('[role="dialog"]').count()==0 and p.locator('h1').inner_text()=='Catalog worklist','5: browser Back also returns a carried choice to its original list without saving')
+        with case('retire-5-small-fixes') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic');p.locator('[data-action="back-worklist"]').click()
+            check(p.get_by_role('dialog').is_visible(),'5: ordinary editor changes still warn before returning to the list')
+        with case('retire-5-small-fixes') as p:
+            p.locator('[data-select-section="name"]').click();p.locator('[data-action="bulk-epic"]').click();save_button(p).click()
+            # Keep the empty-review wording on the screen by deciding the other groups too.
+            p.locator('[data-select-section="multi"]').click();p.locator('[data-action="bulk-olsd"]').click();save_button(p).click();p.locator('[data-select-section="labs"]').click();p.locator('[data-action="bulk-olsd"]').click();save_button(p).click()
+            check('32 tests need approval.' in p.locator('.empty').inner_text(),'5: all-caught-up text counts tests rather than changes')
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:
-    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Next fixes reviewed at 32260a9: consolidated saved changes, confirmation, cancel and source wording','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Browser checks cover all requested items 1–5 and the walk, carry and wording changes; previous workflow regressions retained.','review_baseline':'32260a9','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
+    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Next fixes reviewed at 138948c: deferral, retired downloads, note provenance and approval guidance','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Browser checks cover all requested items 1–4 and the small fixes; earlier workflow regressions retained.','review_baseline':'138948c','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
     (ROOT/'verification.json').write_text(json.dumps(report,indent=2))
 print(json.dumps({'case':ONLY or 'all','passed':len(checks),'click_targets':metrics,'browser_errors':errors},indent=2))

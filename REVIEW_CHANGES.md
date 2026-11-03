@@ -1,16 +1,15 @@
-# Revision 9 — one saved row per field
+# Revision 10 — deferral, retired files, and note provenance
 
-Addresses the next-fixes review at 32260a9. The 308-test sample catalog, existing storage key, one-row-per-test worklist, and separate choose/save/approve/download steps are retained.
+Addresses the next-fixes review at 138948c. The 308-test sample catalog and existing browser-storage key are retained. The one-row-per-test worklist and separate choose/save/approve/download steps remain.
 
-1. Saved fields appear once under Ready for approval, Approved, or Your saved choices. Each row shows In OLSD now and After import/Kept, the note, and one Change button. Approve follows the rows. Edit and Send back are removed from this saved section; Send back remains on the To approve list. Other fields omits fields already displayed above.
-2. Matched exported changes show Confirmed in OLSD with the snapshot date and no Change button. Edit can start a new change requiring approval. Confirmation remains a dated observation, not proof of live publication.
-3. Change cards replace the saved row. Cancel restores that field, preserving other unsaved work. Accepted navigation away closes reopened cards. The heading uses the field name directly.
-4. Saved wording equal to Epic no longer creates a duplicate third card or suppresses normal inline choices.
-5. Any open field can offer Keep my saved wording when its saved value differs from both Epic and OLSD. This survives reload after an OLSD update. The note says You saved; Epic context appears only for a real Epic value change.
-6. Walk endings count both saved tests and tests still needing a choice. Save and finish does not duplicate Save and exit.
-7. Opening a row carries its staged choice into the editor without a dialog only when it is the sole unsaved test. Other cases retain the save/discard warning.
-8. Lab fields use a central-management note for editors and a Lab mappings link for administrators. Set-aside fields use Decide now without an extra Review now link. Navigation buttons say Go to approvals/downloads. Kept summaries include Epic's value; Set aside appears only once per list row.
+1. Decide later on a reopened choice restores its open Epic change, resets proposed content to OLSD, and saves the test under Set aside. Pending fields prevent approval, and Save withdraws an existing approval. Authored-only fields without an Epic difference have no Decide later action. Loading old browser data also recovers orphaned deferrals left by the earlier bug, preserving their reasons.
+2. Each new Excel filename includes a UTC timestamp and unique download ID. Changing a saved choice/content or withdrawing approval retires earlier files containing that test. Retired files say Out of date. Do not import., have no import prompt or Download again, and identify the affected tests. Other approved tests in a mixed file return to To download for a clean replacement. Existing incompatible download history is also checked when loading saved browser data. The earlier-file warning explains that a later snapshot will return an already-imported rejected update to review; this behavior has a browser regression check.
+3. Changing a choice or wording clears its old note. Earlier note appears above an empty note box for deliberate reuse. Save preserves the old note in History; new approvals contain only the current, deliberately supplied note.
+4. Partly decided tests explain that approval requires a choice on every change, and name the waiting fields, including set-aside fields.
+5. An unchanged test has no standalone Other fields heading. A sole carried choice can return to its originating list without prompting or saving, including with browser Back; ordinary editing and other unsaved-test cases retain warnings. Confirmation uses one dated line. All-caught-up text counts tests, not changes.
 
-Each requested item 1–5 has a browser regression case. Additional cases cover skipped walks, staged-choice carry-over, navigation warnings, and the smaller wording/role controls. Prior grouping, saved-choice editing, approval warning, source invalidation, Excel, focus, back-link, and phone checks remain. See verification.json for the full-suite result and exact tested source/test hashes.
+Browser cases cover every requested item 1–4 and the small fixes, including cancelled edits, withdrawn files observed in later snapshots, mixed-file clean replacements, unique filenames, persisted retired-file status, note provenance, and missing-approval explanations. Earlier workflow, Excel, navigation, focus, and phone regressions remain in the full suite. Current results and exact tested source/test hashes appear in verification.json.
 
-Release validation: 336 browser checks passed, with no JavaScript errors. Measured save/single-download/32-name paths remain 2/5/7 clicks.
+Retired history keeps the original downloaded payload and filename for audit. It cannot retract a file already on a user's computer or in OLSD. Reverting a draft does not silently make a retired file importable again; make a fresh approved download instead. A matching snapshot remains a dated observation, not proof of live publication.
+
+Release validation: 379 browser checks passed, with no JavaScript errors. The 2-click save, 5-click single-download, and 7-click 32-name paths remain unchanged.
