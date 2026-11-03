@@ -160,7 +160,7 @@ with sync_playwright() as pw:
             check(p.evaluate("byId('demo-tsh').approval===null && canApprove(byId('demo-tsh'))"),'Withdraw returns the saved update to approval work')
             p.goto(BASE+'/#/worklist?tab=approve');p.locator('[data-send-back="demo-tsh"]').click()
             check(p.evaluate("needsReview(byId('demo-tsh'))"),'Send back returns the update to review')
-            open_test(p,'demo-tsh');check('Review this saved change' in p.locator('.question h2').inner_text(),'Sent-back catalog edits are not falsely called new Epic changes')
+            open_test(p,'demo-tsh');check('Review this saved test name change' in p.locator('.question h2').inner_text(),'Sent-back catalog edits are not falsely called new Epic changes')
     if ONLY in [None,'download-edits-and-status']:
         with case('download-edits-and-status') as p:
             open_test(p,'785260');p.locator('[data-edit-field="conditions"]').click();p.locator('#edit-conditions').fill('New unsaved rejection wording')
@@ -447,7 +447,7 @@ with sync_playwright() as pw:
             check(p.locator('[data-change-group="labs"] [data-row="demo-vitd|labs"]').is_visible() and p.locator('[data-test-row="demo-vitd"]').count()==0,'Partial Save moves the test to its one remaining change section')
             p.locator('[data-test="demo-vitd"]').first.click()
             p.reload();check(p.evaluate("byId('demo-vitd').decisions.name.choice==='epic' && !!byId('demo-vitd').pending.labs"),'Partial Save survives refresh without deciding the remaining field')
-            choose(p,'labs','epic');save_button(p).click()
+            choose(p,'labs','epic');p.locator('[data-action="save"]').click()
             check(p.evaluate("canApprove(byId('demo-vitd'))") and p.locator('.saved-change').count()==2,'Approval becomes available only after both choices are saved')
             approve_one(p,'demo-vitd');wb=click_download(p,'tested-v7-multi-field.xlsx');rows=list(wb['Tests'].values);row=dict(zip(rows[0],rows[1]))
             check(row['Test Name']=='Vitamin D 25-OH, Total','Multi-field workbook contains the explicitly accepted Epic name')
@@ -493,7 +493,8 @@ with sync_playwright() as pw:
             p.locator('[data-select-test="demo-vitd"]').uncheck();p.locator('[data-test="demo-vitd"]').first.click()
             check(p.locator('.question').count()==2 and p.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Both multi-change questions fit on a phone')
             choose(p,'name','epic');choose(p,'labs','olsd')
-            check(p.locator('[data-action="save"]').is_visible() and p.locator('[data-action="save-exit"]').is_visible(),'Phone keeps Save and Save and exit available for multi-change tests')
+            p.locator('[data-action="save-more"]').click()
+            check(p.locator('[data-action="save"]').is_visible() and p.locator('[data-action="save-exit"]').is_visible(),'Phone keeps Save and Save and exit available under More for multi-change tests')
             p.screenshot(path=str(ROOT/'review-assets'/'v7-multi-mobile.png'),full_page=True)
     if ONLY in [None,'screen-order-and-other-fields']:
         with case('screen-order-and-other-fields') as p:
@@ -516,9 +517,125 @@ with sync_playwright() as pw:
             check(p.locator('.selection-bar [data-action="walk"]').is_visible() and p.locator('[data-action="bulk-epic"]').count()==0,'A free-text-only test can be selected for walkthrough without bulk acceptance')
             p.locator('.selection-bar [data-action="walk"]').click()
             check(p.evaluate('ui.queue')==['785260'] and p.locator('[data-question="conditions"]').is_visible(),'Selected free-text test opens individually for review')
+    if ONLY in [None,'next-1-change-saved-choice']:
+        with case('next-1-change-saved-choice') as p:
+            open_test(p,'785258');choose(p,'labs','olsd');save_button(p).click();p.reload()
+            check('Kept' in p.locator('[data-saved-choice="labs"]').inner_text(),'1: saved lab keep remains visible after refresh without Undo')
+            p.locator('[data-change-choice="labs"]').click()
+            check(p.locator('[data-answer="labs:epic"]').is_visible() and not p.evaluate('dirtyNow()'),'1: Change reopens lab cards without changing saved data')
+            check(p.locator('[data-answer="labs:epic"]').evaluate('n=>n===document.activeElement'),'1: Change moves keyboard focus into the reopened answer cards')
+            choose(p,'labs','epic');check(p.evaluate("byId('785258').decisions.labs.choice==='olsd'"),'1: new saved-choice selection is not persisted before Save')
+            save_button(p).click();approve_one(p,'785258')
+            check(p.locator('[data-withdraw="785258"]').is_visible(),'1: approved test offers Withdraw approval on its test page')
+            p.locator('[data-change-choice="labs"]').click()
+            check('withdraw' in p.locator('.approval-warning').inner_text() and p.evaluate("approved(byId('785258'))"),'1: reopening an approved choice warns but preserves approval')
+            choose(p,'labs','olsd');save_button(p).click()
+            check(p.evaluate("!approved(byId('785258')) && byId('785258').decisions.labs.choice==='olsd'"),'1: saving a changed choice withdraws approval')
+            p.locator('[data-change-choice="labs"]').click();choose(p,'labs','epic');save_button(p).click()
+            check(p.locator('[data-send-back="785258"]').is_visible(),'1: saved update offers Send back to review on the test page')
+            p.locator('[data-send-back="785258"]').click();check(p.evaluate("toReview(byId('785258'))"),'1: test-page Send back reopens the saved update')
+    if ONLY in [None,'next-2-partial-and-deferred-choices']:
+        with case('next-2-partial-and-deferred-choices') as p:
+            open_test(p,'demo-a1c');choose(p,'name','epic');p.locator('[data-action="save"]').click()
+            check('Hemoglobin A1c, Whole Blood' in p.locator('[data-saved-choice="name"]').inner_text(),'2a: partly finished test displays its saved proposed name')
+            check(p.locator('[data-entry-field="name"] .value').inner_text()=='Hemoglobin A1c','2a: catalog entry displays OLSD name, not the saved proposal')
+            check(p.locator('[data-question="labs"]').is_visible(),'2a: remaining lab question stays visible beside saved choices')
+        with case('next-2-partial-and-deferred-choices') as p:
+            open_test(p,'demo-vitd');choose(p,'name','epic');p.locator('[data-action="defer-rest"]').click();save_button(p).click();p.reload()
+            check('Vitamin D 25-OH, Total' in p.locator('[data-saved-choice="name"]').inner_text(),'2b: accepted name remains visible on a set-aside test')
+            check('Performing laboratories' in p.locator('[data-set-aside="labs"]').inner_text() and 'Chemistry Laboratory KOP' in p.locator('[data-set-aside="labs"]').inner_text(),'2b: Set aside names the field and shows its Epic value')
+            check(p.locator('[data-entry-field="labs"] .value').inner_text()=='Chemistry Laboratory Main Hospital','2b: set-aside catalog entry still shows actual OLSD laboratories')
+    if ONLY in [None,'next-3-sent-back-wording']:
+        with case('next-3-sent-back-wording') as p:
+            open_test(p,'demo-tsh');p.locator('[data-write="name"]').click();p.locator('#edit-name').fill('TSH wording to retain');save_button(p).click()
+            p.locator('[data-send-back="demo-tsh"]').click();p.reload()
+            check('TSH wording to retain' in p.locator('[data-answer="name:saved"]').inner_text(),'3: sent-back custom wording survives reload in a third answer card')
+            p.locator('[data-action="back-worklist"]').click()
+            row=p.locator('[data-test-row="demo-tsh"]')
+            check('TSH wording to retain' in row.inner_text() and row.locator('[data-inline]').count()==0,'3: sent-back row displays saved wording and requires opening the test')
+            row.locator('[data-test="demo-tsh"]').first.click();choose(p,'name','saved');save_button(p).click()
+            check(p.evaluate("byId('demo-tsh').proposed.name==='TSH wording to retain' && canApprove(byId('demo-tsh'))"),'3: Keep my saved wording restores the proposal for separate approval')
+    if ONLY in [None,'next-4-approval-walk']:
+        with case('next-4-approval-walk') as p:
+            for id in ['demo-tsh','demo-crp']:p.locator(f'[data-inline="{id}|name|epic"]').click()
+            save_button(p).click();p.get_by_role('button',name='Go to To approve',exact=True).click()
+            p.locator('[data-action="walk"]').click()
+            check(p.locator('[data-action="approve-next"]').inner_text()=='Approve and next','4: approval list offers a walkthrough with Approve and next')
+            p.locator('[data-action="approve-next"]').click()
+            check(p.locator('h1').inner_text()=='C-Reactive Protein' and p.locator('[data-download-ids]').count()==0,'4: approval moves to next test without offering a single-test download')
+            p.locator('[data-action="approve-next"]').click()
+            check(p.locator('h1').inner_text()=='Catalog worklist' and '2 tests approved' in p.locator('.walk-result').inner_text(),'4: final approval ends the walk and returns to the list')
+            check(p.get_by_role('button',name='Go to To download',exact=True).is_visible() and p.evaluate('state.exports.length')==0,'4: completion offers To download and never creates per-test files')
+    if ONLY in [None,'next-5-review-walk-ending']:
+        with case('next-5-review-walk-ending') as p:
+            p.locator('[data-select="demo-tsh|name"]').check();p.locator('[data-select="demo-crp|name"]').check();p.locator('.selection-bar [data-action="walk"]').click()
+            choose(p,'name','epic');p.locator('[data-action="save-next"]').click();choose(p,'name','epic')
+            check(p.locator('[data-action="save-finish"]').inner_text()=='Save and finish','5: last test offers Save and finish')
+            p.locator('[data-action="save-finish"]').click()
+            check(p.locator('h1').inner_text()=='Catalog worklist' and '2 tests saved' in p.locator('.walk-result').inner_text(),'5: Save and finish returns to the list with a saved-test count')
+            check(p.get_by_role('button',name='Go to To approve',exact=True).is_visible() and p.evaluate('state.tests.filter(canApprove).length')==2,'5: completion points to separate approval without approving')
+        with case('next-5-review-walk-ending') as p:
+            p.locator('[data-select-section="multi"]').click();p.locator('.selection-bar [data-action="walk"]').click()
+            choose(p,'name','epic');p.get_by_role('button',name='Next test',exact=True).click()
+            p.get_by_role('dialog').get_by_role('button',name='Save and continue',exact=True).click()
+            check(p.evaluate("!!byId('demo-vitd').pending.labs && byId('demo-vitd').decisions.name.choice==='epic'"),'5: Next arrow can save a partial decision without resolving its other field')
+            choose(p,'name','epic');choose(p,'labs','olsd');p.locator('[data-action="save-finish"]').click()
+            check('2 tests saved' in p.locator('.walk-result').inner_text(),'5: finished saved count includes choices saved through the navigation prompt')
+            check(p.evaluate("toReview(byId('demo-vitd')) && canApprove(byId('demo-a1c'))"),'5: finish preserves partial work in review and completed work in approval')
+    if ONLY in [None,'next-6-back-link-context']:
+        for tab,id,name in [('all','demo-tsh','All tests'),('download','785260','To download')]:
+            with case('next-6-back-link-context') as p:
+                p.locator(f'[data-tab="{tab}"]').click();p.locator(f'[data-test="{id}"]').first.click()
+                check(name in p.locator('[data-action="back-worklist"]').inner_text(),'6: back link names '+name)
+                p.reload();check(name in p.locator('[data-action="back-worklist"]').inner_text(),'6: list context survives refreshing the test URL')
+                check(p.evaluate('ui.queue.length')==(308 if tab=='all' else 1),'6: refreshed test navigation retains the originating list scope')
+                p.locator('[data-action="back-worklist"]').click();check(p.locator(f'[data-tab="{tab}"]').get_attribute('aria-pressed')=='true','6: back link returns to '+name)
+        with case('next-6-back-link-context') as p:
+            p.locator('#search').fill('Ferritin');p.locator('[data-test="demo-ferritin"]').first.click()
+            check('Search results' in p.locator('[data-action="back-worklist"]').inner_text(),'6: search opens a test with a Search results back link')
+            p.locator('[data-action="back-worklist"]').click();check(p.locator('#search').input_value()=='Ferritin','6: returning preserves the search query')
+    if ONLY in [None,'next-7-primary-save']:
+        with case('next-7-primary-save') as p:
+            p.locator('[data-action="walk"]').click();choose(p,'name','epic');choose(p,'labs','olsd')
+            check(p.locator('.save-bar .primary').get_attribute('data-action')=='save-next','7: review walkthrough makes Save and next primary')
+            check(p.locator('[data-action="save"]').is_visible(),'7: review walkthrough retains a separate Save action')
+        with case('next-7-primary-save') as p:
+            open_test(p,'demo-tsh');choose(p,'name','epic')
+            check(p.locator('.save-bar .primary').get_attribute('data-action')=='save','7: ordinary editor keeps Save primary')
+    if ONLY in [None,'next-8-16-worklist-and-small-fixes']:
+        with case('next-8-16-worklist-and-small-fixes') as p:
+            p.locator('[data-select="demo-crp|name"]').check();p.locator('[data-inline="demo-tsh|name|epic"]').click()
+            check(p.locator('[data-select="demo-crp|name"]').is_checked(),'8: inline choice preserves other ticked rows')
+            check(p.locator('.selection-bar [data-action="save"]').is_visible(),'9: selection bar exposes Save for another unsaved choice')
+            p.locator('.selection-bar [data-action="save"]').click()
+            check(p.evaluate("byId('demo-tsh').decisions.name.choice==='epic'"),'9: selection-bar Save persists unsaved choices')
+            p.locator('summary').filter(has_text='Filter').click();p.locator('#lab-filter').select_option('UC CHEMISTRY')
+            check('of 44 tests' in p.locator('.filter-count').inner_text(),'11: filtered worklist shows the visible and total test counts')
+            check(p.evaluate("age(new Date(Date.now()-25*3600000).toISOString())")=='1 day old','13: source age uses singular day')
+        with case('next-8-16-worklist-and-small-fixes') as p:
+            open_test(p,'demo-crp');choose(p,'name','olsd');p.locator('[data-toggle-note="name"]').click();p.locator('#note-name').fill('Use public wording');save_button(p).click()
+            p.locator('[data-nav="worklist"]').click();p.locator('[data-tab="all"]').click();p.locator('#all-filter').select_option('kept')
+            check('Use public wording' in p.locator('.decision-summary').inner_text() and 'C Reactive Protein' in p.locator('.decision-summary').inner_text(),'10: Kept wording list explains the retained value and note')
+            p.locator('#all-filter').select_option('later');check('Waiting for laboratory guidance' in p.locator('.decision-summary').inner_text(),'10: Set aside list names the field and shows its note')
+        with case('next-8-16-worklist-and-small-fixes') as p:
+            p.evaluate("applySnapshot({'demo-tsh':{conditions:'New conditions'}});render();")
+            open_test(p,'demo-tsh')
+            check("catalog's unacceptable conditions changed" in p.locator('[data-question="conditions"] h2').inner_text(),'12: OLSD change heading names the field')
+            check('Was' in p.locator('.source-context').inner_text() and 'Now' in p.locator('.source-context').inner_text(),'12: OLSD change shows earlier and current values')
+            choose(p,'name','epic');p.locator('[data-action="see-changes"]').click()
+            check(p.locator('[data-unsaved-field="name"]').inner_text().count('Test name')==1,'14: unsaved comparison names a changed field once')
+            p.get_by_role('button',name='Continue choosing',exact=True).click();p.locator('[data-action="discard"]').click();p.locator('[data-action="back-worklist"]').click()
+            p.locator('[data-inline="demo-vitd|name|epic"]').click()
+            check(p.locator('[data-row="demo-vitd|name"] .line-value').inner_text().count('Use Epic')==0,'15: changed line shows Unsaved without repeating the highlighted choice')
+        with case('next-8-16-worklist-and-small-fixes',{'width':390,'height':844}) as p:
+            open_test(p,'demo-vitd');choose(p,'name','epic');choose(p,'labs','olsd')
+            check(p.locator('.save-bar').bounding_box()['height']<=125 and p.locator('.save-bar .primary').is_visible(),'16: collapsed phone save bar stays compact with its main action visible')
+            check(not p.locator('[data-action="save-exit"]').is_visible(),'16: phone secondary actions start behind More')
+            p.locator('[data-action="save-more"]').click();check(p.locator('[data-action="save-exit"]').is_visible(),'16: More reveals phone secondary actions')
+            p.screenshot(path=str(ROOT/'review-assets'/'next-mobile-save.png'),full_page=True)
     check(not errors,'No browser JavaScript exceptions')
     browser.close()
 if ONLY is None:
-    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'One row per test; patch applied to baseline 96184ae','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'All section 6 checks included and passed.','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
+    report={'verified_at':datetime.now(timezone.utc).isoformat(),'review':'Next fixes reviewed at e89992d: saved choices, test walks, worklist and phone controls','commit':'pending-tested-source-commit','test_script':'https://amromeo.github.io/cuddly-garbanzo/check_workflows.py','passed':len(checks),'failed':0,'click_targets':metrics,'storage_key':'olsd-workflow-prototype-v7-test-by-test-20261103','sample_count':308,'patch_baseline':'96184ae','requested_checklist_status':'Every item in sections 1 and 2 has browser checks; prior section 6 regressions retained.','review_baseline':'e89992d','source_sha256':hashlib.sha256((ROOT/'index.html').read_bytes()).hexdigest(),'test_script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'checks':checks}
     (ROOT/'verification.json').write_text(json.dumps(report,indent=2))
 print(json.dumps({'case':ONLY or 'all','passed':len(checks),'click_targets':metrics,'browser_errors':errors},indent=2))

@@ -1,4 +1,20 @@
-# Revision 7 — one row per test
+# Revision 8 — saved choices and complete test walks
+
+Addresses “OLSD prototype: next fixes,” reviewed at e89992d. The existing 308 sample tests, storage key, one-row-per-test grouping, and separate choose/save/approve steps are retained.
+
+- Items 1–2: Your saved choices shows current OLSD, kept/proposed content, notes, and Change. Set aside names each deferred field and its Epic value. The catalog entry uses actual OLSD values. Opening Change has no saved effect; saving a changed approved choice withdraws approval, with a visible warning. Test pages offer Send back or Withdraw approval.
+- Item 3: Sent-back content remains visible after reload in Keep my saved wording. Its worklist row shows the saved wording and opens the test rather than offering bulk replacement.
+- Items 4–5: Selected/full approval walks offer Approve and next and a final return to the list, with Go to To download. Review walks end with Save and finish and a saved-test count. Files remain a separate deliberate action.
+- Items 6–7: Back links use the originating list or search name, including after refresh. Save and next is primary during review walks once every field has a choice; Save remains primary in ordinary editing.
+- Items 8–11: Inline choices preserve checked tests. Selection bars retain Save for unsaved choices. Kept/Set aside lists describe the fields, values, and notes. Filtered lists state the visible and total test counts.
+- Items 12–15: Source-change headings name the field and show Was/Now for OLSD changes. Day ages use the correct singular/plural wording. Unsaved comparisons name the field once. Multi-change lines retain Unsaved and button highlights without repeating the choice text.
+- Item 16: Phone save and selection bars keep the main action visible; More reveals secondary actions in a menu.
+
+Each item in sections 1 and 2 has a browser check. Additional checks cover the worklist, wording, and phone changes; prior grouping, export, source invalidation, and approval checks are retained. Current results and exact hashes appear in verification.json.
+
+## Earlier redesign
+
+### Revision 7 — one row per test
 
 This redesign implements “Make it obvious to use,” reviewed against baseline 15cf047.
 
@@ -36,6 +52,8 @@ Applied the supplied Claude artifact patch with git apply against 96184ae. There
 - The storage key changed to olsd-workflow-prototype-v7-test-by-test-20261103 for fresh sample data.
 - Follow-up fixes retain checkbox focus and use singular test wording in bulk counts.
 
-Validation: all 247 browser checks pass with no JavaScript errors. Checks cover the supplied section 6 checklist: one row per test, section totals matching the To review tab, screen-order navigation, all questions together, Save and next waiting for all choices, and free text remaining open after bulk actions. See verification.json for the full-suite result, tested commit, and source/test hashes.
+The earlier revision added the supplied section 6 checklist: one row per test, section totals matching the To review tab, screen-order navigation, all questions together, Save and next waiting for all choices, and free text remaining open after bulk actions. See verification.json for the full-suite result, tested commit, and source/test hashes.
 
 Free-text-only tests can be selected for Review one by one; bulk actions remain limited to name and lab changes. Other changes name their field and direct the reviewer to open the test. Keyboard hints on multi-change tests follow the first unanswered field and disappear when all are chosen.
+
+Release validation: 302 browser checks passed, with no JavaScript errors. The measured 2-click save, 5-click single-file flow, and 7-click 32-name flow remain unchanged.
