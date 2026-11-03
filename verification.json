@@ -1,9 +1,9 @@
 {
-  "verified_at": "2026-11-03T16:47:19.912020+00:00",
-  "review": "One row per test; patch applied to baseline 96184ae",
-  "commit": "1646a8f1278904611ff62c0ac24487bcbb260a63",
+  "verified_at": "2026-11-03T17:34:40.734843+00:00",
+  "review": "Next fixes reviewed at e89992d: saved choices, test walks, worklist and phone controls",
+  "commit": "c2b46d2391f7cd358579fc0178567a384ab0622c",
   "test_script": "https://amromeo.github.io/cuddly-garbanzo/check_workflows.py",
-  "passed": 247,
+  "passed": 302,
   "failed": 0,
   "click_targets": {
     "single_change_to_download_clicks": 5,
@@ -13,9 +13,10 @@
   "storage_key": "olsd-workflow-prototype-v7-test-by-test-20261103",
   "sample_count": 308,
   "patch_baseline": "96184ae",
-  "requested_checklist_status": "All section 6 checks included and passed.",
-  "source_sha256": "04dfe35efd4c7cf5bfda68e7e55b81d3bdb1363e6500b2a50b98fcc451768090",
-  "test_script_sha256": "67a67f6671d1bf60dfcaa2d608d0901be5429831ede126d952a0b6e963c59a93",
+  "requested_checklist_status": "Every item in sections 1 and 2 has browser checks; prior section 6 regressions retained.",
+  "review_baseline": "e89992d",
+  "source_sha256": "30c43dd8f836a548f4dda8838b270b772c9e0e4225158095936a395bbf8d6e32",
+  "test_script_sha256": "18d0b8516cf43e1a5f9b08ce082a867c87496c4e07feb3ba61c15ee7594c3300",
   "checks": [
     {
       "case": "five-click-flow",
@@ -1199,7 +1200,7 @@
     },
     {
       "case": "multi-keyboard-and-mobile",
-      "description": "Phone keeps Save and Save and exit available for multi-change tests",
+      "description": "Phone keeps Save and Save and exit available under More for multi-change tests",
       "passed": true
     },
     {
@@ -1248,12 +1249,286 @@
       "passed": true
     },
     {
-      "case": "screen-order-and-other-fields",
+      "case": "next-1-change-saved-choice",
+      "description": "1: saved lab keep remains visible after refresh without Undo",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: Change reopens lab cards without changing saved data",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: Change moves keyboard focus into the reopened answer cards",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: new saved-choice selection is not persisted before Save",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: approved test offers Withdraw approval on its test page",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: reopening an approved choice warns but preserves approval",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: saving a changed choice withdraws approval",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: saved update offers Send back to review on the test page",
+      "passed": true
+    },
+    {
+      "case": "next-1-change-saved-choice",
+      "description": "1: test-page Send back reopens the saved update",
+      "passed": true
+    },
+    {
+      "case": "next-2-partial-and-deferred-choices",
+      "description": "2a: partly finished test displays its saved proposed name",
+      "passed": true
+    },
+    {
+      "case": "next-2-partial-and-deferred-choices",
+      "description": "2a: catalog entry displays OLSD name, not the saved proposal",
+      "passed": true
+    },
+    {
+      "case": "next-2-partial-and-deferred-choices",
+      "description": "2a: remaining lab question stays visible beside saved choices",
+      "passed": true
+    },
+    {
+      "case": "next-2-partial-and-deferred-choices",
+      "description": "2b: accepted name remains visible on a set-aside test",
+      "passed": true
+    },
+    {
+      "case": "next-2-partial-and-deferred-choices",
+      "description": "2b: Set aside names the field and shows its Epic value",
+      "passed": true
+    },
+    {
+      "case": "next-2-partial-and-deferred-choices",
+      "description": "2b: set-aside catalog entry still shows actual OLSD laboratories",
+      "passed": true
+    },
+    {
+      "case": "next-3-sent-back-wording",
+      "description": "3: sent-back custom wording survives reload in a third answer card",
+      "passed": true
+    },
+    {
+      "case": "next-3-sent-back-wording",
+      "description": "3: sent-back row displays saved wording and requires opening the test",
+      "passed": true
+    },
+    {
+      "case": "next-3-sent-back-wording",
+      "description": "3: Keep my saved wording restores the proposal for separate approval",
+      "passed": true
+    },
+    {
+      "case": "next-4-approval-walk",
+      "description": "4: approval list offers a walkthrough with Approve and next",
+      "passed": true
+    },
+    {
+      "case": "next-4-approval-walk",
+      "description": "4: approval moves to next test without offering a single-test download",
+      "passed": true
+    },
+    {
+      "case": "next-4-approval-walk",
+      "description": "4: final approval ends the walk and returns to the list",
+      "passed": true
+    },
+    {
+      "case": "next-4-approval-walk",
+      "description": "4: completion offers To download and never creates per-test files",
+      "passed": true
+    },
+    {
+      "case": "next-5-review-walk-ending",
+      "description": "5: last test offers Save and finish",
+      "passed": true
+    },
+    {
+      "case": "next-5-review-walk-ending",
+      "description": "5: Save and finish returns to the list with a saved-test count",
+      "passed": true
+    },
+    {
+      "case": "next-5-review-walk-ending",
+      "description": "5: completion points to separate approval without approving",
+      "passed": true
+    },
+    {
+      "case": "next-5-review-walk-ending",
+      "description": "5: Next arrow can save a partial decision without resolving its other field",
+      "passed": true
+    },
+    {
+      "case": "next-5-review-walk-ending",
+      "description": "5: finished saved count includes choices saved through the navigation prompt",
+      "passed": true
+    },
+    {
+      "case": "next-5-review-walk-ending",
+      "description": "5: finish preserves partial work in review and completed work in approval",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: back link names All tests",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: list context survives refreshing the test URL",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: refreshed test navigation retains the originating list scope",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: back link returns to All tests",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: back link names To download",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: list context survives refreshing the test URL",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: refreshed test navigation retains the originating list scope",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: back link returns to To download",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: search opens a test with a Search results back link",
+      "passed": true
+    },
+    {
+      "case": "next-6-back-link-context",
+      "description": "6: returning preserves the search query",
+      "passed": true
+    },
+    {
+      "case": "next-7-primary-save",
+      "description": "7: review walkthrough makes Save and next primary",
+      "passed": true
+    },
+    {
+      "case": "next-7-primary-save",
+      "description": "7: review walkthrough retains a separate Save action",
+      "passed": true
+    },
+    {
+      "case": "next-7-primary-save",
+      "description": "7: ordinary editor keeps Save primary",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "8: inline choice preserves other ticked rows",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "9: selection bar exposes Save for another unsaved choice",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "9: selection-bar Save persists unsaved choices",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "11: filtered worklist shows the visible and total test counts",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "13: source age uses singular day",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "10: Kept wording list explains the retained value and note",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "10: Set aside list names the field and shows its note",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "12: OLSD change heading names the field",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "12: OLSD change shows earlier and current values",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "14: unsaved comparison names a changed field once",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "15: changed line shows Unsaved without repeating the highlighted choice",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "16: collapsed phone save bar stays compact with its main action visible",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "16: phone secondary actions start behind More",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
+      "description": "16: More reveals phone secondary actions",
+      "passed": true
+    },
+    {
+      "case": "next-8-16-worklist-and-small-fixes",
       "description": "No browser JavaScript exceptions",
       "passed": true
     }
   ],
-  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/1646a8f1278904611ff62c0ac24487bcbb260a63",
-  "commit_scope": "Tested application, browser checks, and review documents; verification metadata committed separately.",
-  "patch_artifact": "https://claude.ai/public/artifacts/370408b0-b24f-4927-9ee5-f575303a6bfc"
+  "commit_url": "https://github.com/amromeo/cuddly-garbanzo/commit/c2b46d2391f7cd358579fc0178567a384ab0622c",
+  "commit_scope": "Tested application, browser checks, and reviewer documents; verification metadata committed separately."
 }
