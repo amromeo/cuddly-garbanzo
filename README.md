@@ -53,3 +53,7 @@ Release validation: 498 browser checks passed, with no JavaScript errors. The me
 This release integrates Thread A (`3cf0e02`) and Thread B (`1220f38`). Snapshot comparison freezes each test's expected file row before processing any results. A mismatch returns only that test to review; matching tests become Done regardless of row order. Downloads names the differing test and directs the reviewer to To review. This comparison outcome does not retire the file or warn against importing it; a person's changed choice or withdrawn approval still retires unconfirmed files. Older comparison-cascade records are repaired without resetting browser data.
 
 New files say “Nothing has reached OLSD yet.” A partly confirmed file names the remaining unconfirmed tests. Editing Other fields offers Add a note. Single-card choices display shortcut 1, and the keyboard handler supports both matching Epic/OLSD values and fields with no Epic source. Thread B's owned functions and mismatch-position check are retained unchanged.
+
+## Posit Connect pilot implementation
+
+The separate [R/Shiny pilot](pilot/README.md) implements server-owned workflow state with versioned pins, authenticated roles, one active writer, source refresh, Excel export, and migration/recovery tooling. See its [deployment runbook](pilot/DEPLOYMENT.md) and [verification report](pilot/verification.json). It has not been deployed to the institutional Connect server or validated through a real OLSD import. The public static prototype remains the approved workflow reference.

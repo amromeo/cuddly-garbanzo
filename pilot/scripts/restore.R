@@ -1,0 +1,7 @@
+source('R/core.R');source('R/storage.R')
+args<-commandArgs(TRUE)
+if(length(args)!=2||args[[2]]!='--app-stopped') fail('Usage: Rscript scripts/restore.R backup.rds --app-stopped')
+cfg<-config();lock<-acquire_process_lock(cfg)
+backend<-pin_backend(board_for(cfg),cfg$pin,FALSE);old<-backend$read();backup<-validate_state(readRDS(args[[1]]))
+backup$revision<-old$revision+1L;backup$requests<-list();backup<-record(backup,list(user=Sys.getenv('OLSD_RESTORE_OPERATOR','administrator')),'Restored backup',before=list(revision=old$revision),after=list(backup_revision=readRDS(args[[1]])$revision))
+backend$write(backup);filelock::unlock(lock);cat('Restored as revision',backup$revision,'\n')

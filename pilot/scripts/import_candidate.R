@@ -1,0 +1,7 @@
+source('R/core.R');source('R/storage.R')
+args<-commandArgs(TRUE)
+if(length(args)!=2||args[[2]]!='--app-stopped') fail('Usage: Rscript scripts/import_candidate.R candidate.rds --app-stopped')
+cfg<-config();lock<-acquire_process_lock(cfg);backend<-pin_backend(board_for(cfg),cfg$pin,TRUE);old<-backend$read()
+if(length(old$tests)||length(old$exports)) fail('Migration target must be an empty, separate pilot state pin.')
+candidate<-validate_state(readRDS(args[[1]]));candidate$revision<-old$revision+1L;backend$write(candidate)
+filelock::unlock(lock);cat('Candidate installed. Review migrated content against fresh Epic and OLSD snapshots.\n')
