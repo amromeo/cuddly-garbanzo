@@ -20,7 +20,7 @@ validate_epic <- function(d) {
  if(!is.data.frame(d)||!all(required%in%names(d))) fail('Missing Epic link columns.')
  d$.pair<-paste(d$id,d$epic_id,sep=':')
  d<-validate_rows(d,c(columns,'.pair'),'.pair');d$.pair<-NULL
- if(any(!grepl('^[0-9]+$',d$id))||any(!nzchar(d$epic_id))||any(!nzchar(d$name))) fail('Epic rows require Procedure IDs, numeric OLSD IDs, and names.')
+ if(any(!grepl('^[0-9]+$',d$id))||any(!nzchar(d$epic_id))) fail('Epic rows require Procedure IDs and numeric OLSD IDs.')
  for(proc in unique(d$epic_id)) {
   rows<-d[d$epic_id==proc,,drop=FALSE]
   if(length(unique(rows$name))>1||length(unique(rows$sections))>1) fail(paste('Conflicting source values for shared Epic procedure',proc))
@@ -57,7 +57,9 @@ normalize_helix <- function(d) {
  if(!length(expanded)) fail('No Epic records contain an OLSD test link.')
  out<-do.call(rbind,lapply(expanded,function(x) as.data.frame(x,stringsAsFactors=FALSE)))
  rownames(out)<-NULL
- list(rows=validate_epic(out),excluded=d[!linked,,drop=FALSE])
+ out<-validate_epic(out)
+ issues<-out[!nzchar(trimws(out$name)),,drop=FALSE];issues$reason<-rep('Missing Epic display name',nrow(issues))
+ list(rows=out,excluded=d[!linked,,drop=FALSE],issues=issues)
 }
 source_reference <- function(kind,rows,version=NULL) list(kind=kind,at=now(),version=version,hash=digest::digest(rows,algo='sha256'))
 read_epic_pin <- function(board,name) {

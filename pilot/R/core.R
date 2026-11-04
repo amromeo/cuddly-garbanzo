@@ -31,6 +31,7 @@ current_export <- function(s,t) {
  if(length(hits)) hits[[length(hits)]] else NULL
 }
 status <- function(s,t) {
+ if(isTRUE(t$source_issue)) return('Source issues')
  if(isTRUE(t$source_conflict)) return('To review')
  if(length(t$blocked)) return('Waiting on mapping')
  if(length(open_fields(t))) return(if(is_deferred(t)) 'Set aside' else 'To review')
@@ -150,7 +151,9 @@ apply_epic <- function(s,rows,source,actor) {
   t$linked_procedures<-group
   primary<-s$source_assignments[[id]]
   normalized_sections<-vapply(strsplit(group$sections,';',fixed=TRUE),function(x) paste(sort(unique(trimws(x))),collapse=';'),character(1))
-  conflict<-(!is.null(primary)&&!primary%in%group$epic_id)||(is.null(primary)&&(length(unique(group$name))>1||length(unique(normalized_sections))>1))
+  candidates<-if(!is.null(primary)&&primary%in%group$epic_id) group[group$epic_id==primary,,drop=FALSE] else group
+  t$source_issue<-any(!nzchar(trimws(candidates$name)))
+  conflict<-t$source_issue||(!is.null(primary)&&!primary%in%group$epic_id)||(is.null(primary)&&(length(unique(group$name))>1||length(unique(normalized_sections))>1))
   if(conflict) {
    t$source_conflict<-TRUE;t$blocked<-c('name','labs','categories');t$epic_id<-paste(group$epic_id,collapse=', ');t$section<-paste(unique(group$sections),collapse=' | ');t$sources$epic<-source
    for(k in c('name','labs','categories')) {t$epic[k]<-list(NULL);t$pending[[k]]<-list(source='Procedure assignment',before=t$olsd[[k]],after=NULL,saved=t$proposed[[k]])}
@@ -159,6 +162,7 @@ apply_epic <- function(s,rows,source,actor) {
    s$tests[[id]]<-t;next
   }
   r<-if(!is.null(primary)) group[group$epic_id==primary,,drop=FALSE] else group[1,,drop=FALSE]
+  if(isTRUE(t$source_conflict)&&!is.null(t$approval)) t$approval<-NULL
   t$source_conflict<-FALSE
   sections<-trimws(strsplit(r$sections,';',fixed=TRUE)[[1]]);m<-s$mappings[match(sections,s$mappings$section),,drop=FALSE]
   blocked<-!length(sections)||anyNA(m$lab)||any(!nzchar(m$lab))
@@ -203,6 +207,8 @@ display_date <- function(value) {
 assign_procedure <- function(s,id,procedure,rows,source,actor) {
  require_role(actor,TRUE)
  if(!id%in%names(s$tests)||!procedure%in%rows$epic_id[rows$id==id]) fail('Choose a procedure currently linked to this OLSD entry.')
+ selected<-rows[rows$id==id & rows$epic_id==procedure,,drop=FALSE]
+ if(!nzchar(trimws(selected$name))) fail('This procedure has no Epic display name. Correct the warehouse source or choose a complete linked procedure.')
  previous<-s$source_assignments[[id]]
  s$source_assignments[[id]]<-procedure
  s<-retire(s,id,'The primary Epic procedure assignment changed.');s$tests[[id]]$approval<-NULL

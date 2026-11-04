@@ -62,7 +62,7 @@ server<-function(input,output,session) {
  rows<-reactive({
   ts<-s()$tests;q<-tolower(input$search%||%'');filter<-input$lab%||%'All'
   if(nzchar(q)) ts<-Filter(function(t) grepl(q,tolower(paste(t$olsd$name,t$number,t$id)),fixed=TRUE),ts)
-  else ts<-Filter(function(t) {st<-status(s(),t);switch(tab(),'To review'=st%in%c('To review','Waiting on mapping'),'To approve'=st=='To approve','To download'=st=='To download','Kept wording'=st=='Kept wording','Set aside'=st=='Set aside',TRUE)},ts)
+  else ts<-Filter(function(t) {st<-status(s(),t);switch(tab(),'To review'=st%in%c('To review','Waiting on mapping'),'To approve'=st=='To approve','To download'=st=='To download','Kept wording'=st=='Kept wording','Set aside'=st=='Set aside','Source issues'=st=='Source issues',TRUE)},ts)
   if(filter!='All') ts<-Filter(function(t) identical(t$section,filter),ts)
   if(tab()=='To review'&&!nzchar(q)) ts<-ts[order(vapply(ts,function(t) {n<-length(open_fields(t));if(length(t$blocked)) 5 else if(n>1) 1 else if('name'%in%open_fields(t)) 2 else if('labs'%in%open_fields(t)) 3 else 4},numeric(1)))]
   ts
@@ -121,7 +121,7 @@ server<-function(input,output,session) {
    members<-Filter(function(t) section_for(t)==group,ts)
    if(length(members)) tagList(tags$tr(tags$th(colspan=4,paste(group,'·',length(members)),button('Select section','select_group',group))),lapply(members,row))
   }) else lapply(ts,row)
-  tagList(tags$h1('Catalog worklist'),tags$div(class='tabs',lapply(c('To review','To approve','To download','Kept wording','Set aside','All tests'),function(x) button(paste(x,if(x=='All tests') length(s()$tests) else if(x%in%names(counts)) unname(counts[x]) else 0),'tab',x,class=if(tab()==x) 'active' else ''))),
+  tagList(tags$h1('Catalog worklist'),tags$div(class='tabs',lapply(c('To review','To approve','To download','Kept wording','Set aside','Source issues','All tests'),function(x) button(paste(x,if(x=='All tests') length(s()$tests) else if(x%in%names(counts)) unname(counts[x]) else 0),'tab',x,class=if(tab()==x) 'active' else ''))),
    tags$p(paste(length(ts),'of',if(nzchar(input$search%||%'')) length(s()$tests) else if(tab()=='All tests') length(s()$tests) else if(tab()%in%names(counts)) counts[tab()] else 0,'tests')),
    tags$p(paste('Open changes:',sum(vapply(s()$tests,function(t) 'name'%in%open_fields(t),logical(1))),'names ·',sum(vapply(s()$tests,function(t) 'labs'%in%open_fields(t),logical(1))),'labs ·',sum(vapply(s()$tests,function(t) length(t$blocked)>0,logical(1))),'mapping problems')),
    button('Apply latest Epic source','apply_source'),
@@ -150,7 +150,8 @@ server<-function(input,output,session) {
   tagList(button(paste('Back to',origin()),'back'),tags$h1(t$olsd$name),tags$p(paste(t$number,'· OLSD',t$id,'· Epic',t$epic_id)),if(nzchar(t$link_label%||%'')) tags$p(paste('Epic link:',t$link_label)),if(isTRUE(t$shared_procedure)) tags$p('This Epic procedure links to multiple OLSD entries. Review each entry separately; keep specimen-specific OLSD names unless you explicitly choose a replacement.'),tags$p(status(s(),t)),tags$p(paste('OLSD observed:',display_date(t$sources$olsd$at),'· Epic checked:',display_date(t$sources$epic$at))),
    tags$div(class='steps',paste('Compare & edit →',if(ready(t)) 'Approved → Download / confirm' else 'Review & approve → Download / confirm')),
    if(!is.null(t$linked_procedures)) tags$section(tags$h2('Linked Epic procedures'),tableOutput('linked_procedures'),
-    if(isTRUE(t$source_conflict)) tags$div(class='blocker',tags$strong('Choose which Epic procedure drives this OLSD entry.'),tags$p('The linked procedures have conflicting source values, or the previous assignment is no longer linked. Current OLSD content is preserved; approval is unavailable until an administrator resolves the assignment.')),
+    if(isTRUE(t$source_issue)) tags$div(class='blocker',tags$strong('Set aside: missing Epic display name.'),tags$p('This entry is retained for later source correction. Current OLSD content is unchanged; it cannot be approved or exported using incomplete source data. Other entries can continue.')),
+    if(isTRUE(t$source_conflict)&&!isTRUE(t$source_issue)) tags$div(class='blocker',tags$strong('Choose which Epic procedure drives this OLSD entry.'),tags$p('The linked procedures have conflicting source values, or the previous assignment is no longer linked. Current OLSD content is preserved; approval is unavailable until an administrator resolves the assignment.')),
     if(actor$role=='admin') tagList(selectInput('primary_procedure','Procedure that drives updates',choices=c('Select a procedure'='',setNames(t$linked_procedures$epic_id,paste(t$linked_procedures$epic_id,t$linked_procedures$name,sep=' · '))),selected=s()$source_assignments[[t$id]]%||%'',selectize=FALSE),button('Save procedure assignment','assign_procedure',t$id))),
    if(length(t$blocked)&&!isTRUE(t$source_conflict)) tags$div(class='blocker',tags$strong(paste('Waiting on the',t$section,'lab mapping.')),tags$p('An administrator must complete this shared mapping before approval.'),button('Request mapping review','request_mapping',t$id),if(actor$role=='admin') button('Open lab mappings','mappings')),
    if(length(open)) uiOutput('progress'),
