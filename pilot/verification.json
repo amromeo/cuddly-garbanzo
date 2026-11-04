@@ -1,18 +1,19 @@
 {
-  "verified_at": "2026-11-04T00:50:15.117969+00:00",
-  "source_commit": "418e4079975c3ca1114902be7c9ad9f0d765e960",
+  "verified_at": "2026-11-04T01:06:58.846864+00:00",
+  "source_commit": "c9d827135d0b427c180631539c9a1c0bc736b796",
   "prototype_baseline": "6f0443b",
   "r": {
-    "at": "2026-11-04T00:49:34Z",
-    "tests": 27,
-    "passed": 162,
+    "at": "2026-11-04T01:05:09Z",
+    "tests": 30,
+    "passed": 174,
     "failed": 0,
     "errors": 0
   },
   "browser": {
-    "passed": 20,
+    "passed": 21,
     "checks": [
       "OLSD upload preview and explicit acceptance",
+      "Mapping choices come from uploaded data and saved mappings prefill on return",
       "Two tests appear once each after source and mapping application",
       "A second browser session cannot write shared state",
       "Shared procedure context and link label are shown without replacing the OLSD name",
@@ -54,9 +55,9 @@
     "pilot/R/core.R": "ad2ab69c95a516087356656c31d7d80748d7436dab447d09e1168a79ea4423ac",
     "pilot/R/exports.R": "bdff8e6a5a3d2f1890429337967dfa57e73589f217774df50f126211954e465a",
     "pilot/R/migration.R": "eefbc02f29f4f95d9d892aa8b6e46f5098014d2cb7349d002922b6553722ab2f",
-    "pilot/R/sources.R": "d49175fc8b03763092334908bbaeb3d17f556db25172cc5146afa887a2e4c5e5",
-    "pilot/R/storage.R": "06631d54a386e80aa0072ad1aca295770fab03b104c1760121baffdd3d06fa7a",
-    "pilot/app.R": "7fb4621083b48205d31a8d72e35cbeb5a52e473b248f9c8cfda76373fcf296eb",
+    "pilot/R/sources.R": "42a3356909af453d3e445c1298aa7f755e1e1480147f2083d33eea2a318b26ff",
+    "pilot/R/storage.R": "18e9ddbf1f11ad99ff41c4bc0f72c0a3046a759b9b71ad057e98f1761c3017fc",
+    "pilot/app.R": "7718c53efde7a4d1ff9ef83c18464d6647b46992ab712eb1b7a0ef1704411fa3",
     "pilot/jobs/helix_direct.R": "b341a431e0156aec45cd442743e98ceb11546e5833a70d903fbedfba546fe326",
     "pilot/jobs/refresh_epic.R": "745f9922e6a17f4aaf53b29d27aa54d1d8641c238d271a9c4ed8917db907c5b2",
     "pilot/renv.lock": "20c88dd6f83de7fb1d15fcfd5dce68ae44046b2c3b757e7eba7b9a456f9f7d35",
@@ -67,17 +68,35 @@
     "pilot/scripts/preflight.R": "acaac456be10788074110ed3b0f2ac6a22cacdd2867a718a0818f96a33a9a2f5",
     "pilot/scripts/restore.R": "20bb0a421745a3710dd0c5becb0b7380a3813ee6bf628b6e006b812d9ea706a2",
     "pilot/source_job.R": "2d9fa6f79e95af8f7a11fbe4f37286e435b6c1e585c8261e9c40f5ad39ce870d",
-    "pilot/tests/browser.py": "230206a259f2c30f12b7738a157a0b7eceb8dae8c1e3d4d8b9aae715a83e032d",
+    "pilot/tests/browser.py": "db1424e1165f581fcf6796729439cc98cfc96c227c7654cd6eb10b815e1135c7",
+    "pilot/tests/browser_scale.py": "8af2b0083dacaafb2a41a3bc1ccce8b9d1971b502a2e8f01189aaa46eaaa8e6b",
     "pilot/tests/run.R": "90bbfa3cfcf1321e706ff1d7f6db44f584be980e6c2e1565d92645cb214b3858",
-    "pilot/tests/run_browser.py": "c339102514640f70a36f034010baa4cc332455ef680a20ff99df24c806375891",
+    "pilot/tests/run_browser.py": "e43558018cb7a649a2e21c32e19708798285a4927c3f82e680be7f8a158bce39",
     "pilot/tests/seed_browser.R": "b036875790a0fdfbe9dbb3d8ed248926c62e3dc01fa6bc398c58ee92cfb13f43",
+    "pilot/tests/seed_scale.R": "01ed9065885064973a2cad638fab74c58aad712bf9ddf5645d69c10a11f1b002",
     "pilot/tests/testthat/helper-pilot.R": "402edbce24aab25243316fb692560bc5a82ea8a4004a4a7d9d4d73f6ba7b62a7",
+    "pilot/tests/testthat/test-mapping-options.R": "a1ce56eb22c702335b455d1963597465c0f82ef9b82ac4844e17660f9a64f3dd",
     "pilot/tests/testthat/test-migration.R": "48bf053b40925efb2a01820495cab2b16fea248a0cf7f6270754153af2ceb8d9",
     "pilot/tests/testthat/test-source-links.R": "54658e8406d08b35c605f6f3dbb9242c1cf00270cfc6f1c4c32e278f599186e1",
-    "pilot/tests/testthat/test-storage.R": "8c0e76a8577f1ba3d13ce8f1f4c9424ec72460d84b2bf9aad798df2ae1c8156c",
+    "pilot/tests/testthat/test-storage.R": "acbaf4326a2b2b5670491650b7cc1c5d2abe4bb730f5c10ac14ca3742d0fe578",
     "pilot/tests/testthat/test-workflow.R": "85b9f4781605260b79b4a11ade70c4c268bfa736f978c2af5ec3d6c97b0f1622",
     "pilot/www/pilot.css": "3aada3d2d38a566242ed1bb6679c2a63ea88310ff41ce206b9f6bd66cf9d525d",
-    "pilot/www/pilot.js": "712b24b766a8c97ac2df72acb3096f3b8828524fd50087449778c67d9f0cb960"
+    "pilot/www/pilot.js": "60e3bf7b559d5c784448e324ad4b6695a6fcbfec4d134c69a7e4c284b7180b0c"
   },
-  "windows_path_validation": "Short-name path-budget regression and real folder-pin write/read passed in Linux test runtime; native Windows verification remains local."
+  "windows_path_validation": "Short-name path-budget regression and real folder-pin write/read passed in Linux test runtime; native Windows verification remains local.",
+  "scale": {
+    "catalog_count": 1542,
+    "initial_rows": 50,
+    "expanded_rows": 100,
+    "bulk_selected": 1542,
+    "selection_after_unchecking_one_visible_row": 1541,
+    "navigation_round_trip_seconds": [
+      1.1296501329998136,
+      0.9930797950000851,
+      0.9920209189949674,
+      1.081082441000035
+    ],
+    "median_navigation_round_trip_seconds": 1.03708111800006,
+    "browser_errors": []
+  }
 }
