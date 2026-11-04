@@ -191,14 +191,14 @@ server<-function(input,output,session) {
   if(!section%in%choices$sections) section<-''
   existing<-s()$mappings[s()$mappings$section==section,,drop=FALSE]
   tagList(selectInput('section','Epic section',choices=c('Select an Epic section'='',choices$sections),selected=section,selectize=FALSE),
-   selectizeInput('public_lab','Public laboratory name',choices=c('Select or enter a laboratory'='',choices$labs),selected=if(nrow(existing)) existing$lab[[1]] else '',options=list(create=TRUE)),
-   selectizeInput('category','Search category',choices=c('Select or enter a category'='',choices$categories),selected=if(nrow(existing)) existing$category[[1]] else '',options=list(create=TRUE)),
+   selectizeInput('public_lab','Public laboratory name',choices=c('Select or enter a laboratory'='',choices$labs),selected=if(nrow(existing)) map_selected(existing$lab[[1]],options()$labs) else '',options=list(create=TRUE)),
+   selectizeInput('category','Search category',choices=c('Select or enter a category'='',choices$categories),selected=if(nrow(existing)) map_selected(existing$category[[1]],options()$categories) else '',options=list(create=TRUE)),
    tags$p('Choices come from your source data and saved mappings. Select a section to edit its saved mapping. New names require your explicit entry; similar names are not automatically matched.'),button('Save shared mapping','save_mapping'))
  })
  observeEvent(input$section,{
   section<-input$section;existing<-s()$mappings[s()$mappings$section==section,,drop=FALSE]
-  updateSelectizeInput(session,'public_lab',selected=if(nrow(existing)) existing$lab[[1]] else '')
-  updateSelectizeInput(session,'category',selected=if(nrow(existing)) existing$category[[1]] else '')
+  updateSelectizeInput(session,'public_lab',selected=if(nrow(existing)) map_selected(existing$lab[[1]],options()$labs) else '')
+  updateSelectizeInput(session,'category',selected=if(nrow(existing)) map_selected(existing$category[[1]],options()$categories) else '')
  },ignoreNULL=TRUE)
  output$mapping_table<-renderTable(s()$mappings)
  output$snapshot_preview<-renderUI(if(!is.null(upload())) tagList(tags$p(paste(nrow(upload()$rows),'tests; accepting this snapshot may return affected tests to review.')),tableOutput('upload_table'),button('Accept snapshot','accept_snapshot')))
@@ -262,7 +262,7 @@ server<-function(input,output,session) {
   }
   if(a=='save_mapping') {
    capture();if(length(drafts())) fail('Save or discard choices before changing a shared mapping.');
-   require_role(actor,TRUE);section<-trimws(input$section);lab<-trimws(input$public_lab);category<-trimws(input$category)
+   require_role(actor,TRUE);section<-trimws(input$section);lab<-catalog_plain_text(input$public_lab%||%'');category<-catalog_plain_text(input$category%||%'')
    if(!nzchar(section)||!nzchar(lab)||grepl('[;\r\n]',category)) fail('Supply an Epic section, a laboratory name, and one category.')
    src<-if(pins::pin_exists(board,cfg$source_pin)) read_epic_pin(board,cfg$source_pin) else NULL
    write(function(st) {st$mappings<-rbind(st$mappings[st$mappings$section!=section,,drop=FALSE],data.frame(section=section,lab=lab,category=category));st$categories<-unique(c(st$categories,category));st<-record(st,actor,'Saved shared mapping',section,after=list(lab=lab,category=category));if(!is.null(src)) st<-apply_epic(st,src$rows,src$reference,actor);st},TRUE);notify('Mapping saved. Affected tests require review.');return()
