@@ -75,3 +75,18 @@ For a failed release, disable writes, retain the current pin versions, and redep
 ## Incomplete source records
 
 A missing Epic display name does not fail the complete refresh. The source payload retains affected linked rows in `issues`; procedures without an OLSD link remain in `excluded`. Inspect the app's **Source issues** tab separately from normal review. Do not insert a guessed name or silently drop the link. Correct the warehouse source later, or explicitly assign a complete linked procedure as primary. The app keeps existing OLSD/proposed content and prevents approval from incomplete source data. After correcting the query/source, rerun the source job and apply the new snapshot to resume review.
+
+## Windows local storage paths
+
+Windows/R packages can reject paths over 260 characters. Keep local folder pins outside deep OneDrive/project folders. New snapshot and export pins use short names derived from the state namespace and full artifact identity; full hashes stay in the saved records, and historical references are not renamed.
+
+For a fresh local test with no accepted snapshot, stop Shiny, select a short user-owned folder, regenerate the source pin, and restart:
+
+```r
+Sys.setenv(OLSD_BACKEND = "folder",
+           OLSD_DATA_DIR = file.path(Sys.getenv("USERPROFILE"), "olsd-pins"))
+source("source_job.R")
+shiny::runApp(".")
+```
+
+This starts a separate local store and leaves the previous folder intact. If there are saved drafts, approvals, or export history, stop the app and copy the existing store into the new location before using it; do not initialize a fresh store over existing work. The source-job and application must use the same `OLSD_DATA_DIR`. This local setting does not change Connect pin storage.
