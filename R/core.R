@@ -146,7 +146,7 @@ apply_epic <- function(s,rows,source,actor) {
   sections<-trimws(strsplit(r$sections,';',fixed=TRUE)[[1]]);m<-s$mappings[match(sections,s$mappings$section),,drop=FALSE]
   blocked<-!length(sections)||anyNA(m$lab)||any(!nzchar(m$lab))
   vals<-list(name=r$name,labs=if(blocked) NULL else paste(unique(m$lab),collapse='\n'),categories=if(blocked) NULL else paste(unique(m$category[nzchar(m$category)]),collapse=';'))
-  t$sources$epic<-source;t$epic_id<-r$epic_id;t$section<-r$sections;t$blocked<-if(blocked) 'labs' else character()
+  t$shared_procedure<-sum(rows$epic_id==r$epic_id)>1;t$link_label<-r$link_label%||%'';t$link_url<-r$link_url%||%'';t$sources$epic<-source;t$epic_id<-r$epic_id;t$section<-r$sections;t$blocked<-if(blocked) 'labs' else character()
   for(k in names(vals)) {
    v<-vals[[k]]
    if(!same(v,t$epic[[k]],k)) {

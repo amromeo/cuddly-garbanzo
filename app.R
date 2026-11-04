@@ -145,7 +145,7 @@ server<-function(input,output,session) {
  testpage<-function() {
   t<-current();if(is.null(t)) return(tags$p('Test not found.'))
   open<-unique(c(open_fields(t),edits()));saved<-setdiff(names(t$choices),open);other<-setdiff(names(fields),c(open,saved))
-  tagList(button(paste('Back to',origin()),'back'),tags$h1(t$olsd$name),tags$p(paste(t$number,'· OLSD',t$id,'· Epic',t$epic_id)),tags$p(status(s(),t)),tags$p(paste('OLSD observed:',display_date(t$sources$olsd$at),'· Epic checked:',display_date(t$sources$epic$at))),
+  tagList(button(paste('Back to',origin()),'back'),tags$h1(t$olsd$name),tags$p(paste(t$number,'· OLSD',t$id,'· Epic',t$epic_id)),if(nzchar(t$link_label%||%'')) tags$p(paste('Epic link:',t$link_label)),if(isTRUE(t$shared_procedure)) tags$p('This Epic procedure links to multiple OLSD entries. Review each entry separately; keep specimen-specific OLSD names unless you explicitly choose a replacement.'),tags$p(status(s(),t)),tags$p(paste('OLSD observed:',display_date(t$sources$olsd$at),'· Epic checked:',display_date(t$sources$epic$at))),
    tags$div(class='steps',paste('Compare & edit →',if(ready(t)) 'Approved → Download / confirm' else 'Review & approve → Download / confirm')),
    if(length(t$blocked)) tags$div(class='blocker',tags$strong(paste('Waiting on the',t$section,'lab mapping.')),tags$p('An administrator must complete this shared mapping before approval.'),button('Request mapping review','request_mapping',t$id),if(actor$role=='admin') button('Open lab mappings','mappings')),
    if(length(open)) uiOutput('progress'),

@@ -6,7 +6,7 @@
 2. Create **separate development and pilot content**, each with distinct state, source, snapshot, and export pin namespaces. Restrict application and pin visibility to the catalog team. Keep the existing application/state pin intact during migration.
 3. Configure exactly one application process and one replica. Disable scaling to additional workers and overlapping write-capable deployments. A local process lock catches extra workers on the same host, but cannot coordinate different hosts. If Connect cannot enforce this topology, keep writes disabled and use transactional storage before launch.
 4. Select a designated operator, and configure admin identities separately. Only that operator can make changes, including an administrator acting as operator. Other authenticated users can view. A second browser session cannot write until the first session closes; network disconnect cleanup may take the Shiny session timeout.
-5. Validate all source columns, identifiers, section delimiters, lab mappings, category identities, and vendor control columns against actual examples. The adapter expects semicolon-separated Epic sections. Ambiguous OLSD links and duplicate identities fail validation; unlinked Epic rows are retained in the source's excluded table.
+5. Validate all source columns, identifiers, section delimiters, lab mappings, category identities, and vendor control columns against actual examples. The adapter expects semicolon-separated Epic sections. One Epic procedure may link to multiple OLSD entries, each reviewed separately with its link label retained. Different procedures claiming the same OLSD ID, or duplicate raw procedure rows, fail validation; unlinked Epic rows are retained in the source's excluded table.
 6. Validate the importer’s treatment of `Test Managed By`, `Use ARUP Test Name`, blank `ARUP Test Number`, required Test Name, and category append behavior in the vendor test process. Values are read from the snapshot, not hard-coded. No real imports are automated.
 
 Do not enable production writes merely because local checks pass. Connect identity, permission boundaries, deployment topology, service-account write access, and a supervised vendor import are acceptance gates.
@@ -26,7 +26,7 @@ Set these in Connect's environment settings, not an uploaded `.Renviron`:
 | `OLSD_SINGLE_PROCESS_CONFIRMED=true` | Set only after an administrator verifies the topology above. Otherwise writes are disabled. |
 | `OLSD_INITIALIZE=true` | Bootstrap an empty new state pin only. Turn off after the first durable save or candidate import. Missing state then becomes an error. |
 | `OLSD_HELIX_PIN` | Source job: existing institution-provided raw Helix report pin. |
-| `OLSD_HELIX_SQL` | Alternative source job input: institution-provided SQL file path. Used only when no upstream pin is configured. |
+| Query file | For direct warehouse access, include `sql/warehouse_catalog.sql` in the source-job bundle. No SQL-path environment variable is needed. |
 
 The app identity needs read access to the source pin and read/write access to its state, uploaded snapshots, and exported artifact pins. The nightly job identity needs upstream read access and source/status pin write access; it does not need editorial state write access. Do not share development and pilot write credentials unnecessarily.
 

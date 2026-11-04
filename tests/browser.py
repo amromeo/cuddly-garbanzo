@@ -26,7 +26,7 @@ with sync_playwright() as w:
  second.locator('[data-command="open"][data-id="2"]').click();second.locator('input[name="choice_name"][value="olsd"]').check();second.locator('[data-command="save"]').click()
  expect(second.get_by_text('Another browser session has editing control. Close it before taking control here.',exact=False)).to_be_visible();check(True,'A second browser session cannot write shared state');second.close()
 
- cmd('open','1');expect(p.get_by_role('heading',name='Test 1',exact=True)).to_be_visible()
+ cmd('open','1');expect(p.get_by_role('heading',name='Test 1',exact=True)).to_be_visible();expect(p.get_by_text('Epic link: Blood',exact=True)).to_be_visible();expect(p.get_by_text('This Epic procedure links to multiple OLSD entries.',exact=False)).to_be_visible();check(True,'Shared procedure context and link label are shown without replacing the OLSD name')
  expect(p.locator('[data-command="approve"]')).to_have_count(0);check(True,'An undecided test cannot be approved')
  p.locator('input[name="choice_name"][value="epic"]').check();p.locator('#note_name').fill('Pilot reviewer note');cmd('save')
  expect(p.locator('[data-command="approve"]')).to_be_visible();expect(p.get_by_text('Pilot reviewer note',exact=True).first).to_be_visible();check(True,'Save records the decision and note without approval')
