@@ -77,3 +77,25 @@ preview_olsd <- function(s,rows) {
   if(length(changes)) paste(unname(fields[changes]),collapse=', ') else 'Unchanged'
  },character(1)))
 }
+
+mapping_options <- function(s,epic_rows=NULL) {
+ split_values<-function(x,pattern) {
+  x<-unlist(x,use.names=FALSE);x<-x[!is.na(x)]
+  values<-trimws(unlist(strsplit(as.character(x),pattern,perl=TRUE),use.names=FALSE))
+  sort(unique(values[nzchar(values)]))
+ }
+ sections<-c(s$mappings$section,epic_rows$sections,lapply(s$tests,function(t) {
+  if(!is.null(t$linked_procedures)) t$linked_procedures$sections else t$section
+ }))
+ list(sections=split_values(sections,';'),
+ labs=split_values(c(s$mappings$lab,lapply(s$tests,function(t) t$olsd$labs)),'\\r?\\n|;|<br\\s*/?>'),
+ categories=split_values(c(s$categories,s$mappings$category,lapply(s$tests,function(t)t$olsd$categories)),';'))
+}
+worklist_index <- function(s) {
+ statuses<-vapply(s$tests,function(t) status(s,t),character(1));counts<-table(statuses)
+ counts['To review']<-sum(statuses%in%c('To review','Waiting on mapping'))
+ list(statuses=statuses,counts=counts,
+ names=sum(vapply(s$tests,function(t) 'name'%in%open_fields(t),logical(1))),
+ labs=sum(vapply(s$tests,function(t) 'labs'%in%open_fields(t),logical(1))),
+ blocked=sum(vapply(s$tests,function(t) length(t$blocked)>0,logical(1))))
+}

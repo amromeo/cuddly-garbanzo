@@ -32,12 +32,17 @@ pin_write_versioned <- function(board,value,name) {
  pins::pin_write(board,value,name=name,type='rds',versioned=TRUE)
 }
 pin_backend <- function(board,name,initialize=FALSE) {
+ cache<-new.env(parent=emptyenv());cache$version<-NULL;cache$value<-NULL
  list(read=function() {
   if(!pins::pin_exists(board,name)) {if(initialize) return(new_state());fail('Catalog state pin is missing. Initialize explicitly or restore a backup.')}
-  validate_state(pins::pin_read(board,name))
+  version<-pins::pin_meta(board,name)$local$version
+  if(!is.null(version)&&!is.null(cache$value)&&identical(cache$version,version)) return(cache$value)
+  value<-validate_state(pins::pin_read(board,name,version=version))
+  cache$version<-version;cache$value<-value;value
  },write=function(s) {
   pin_write_versioned(board,validate_state(s),name)
   if(!identical(pins::pin_read(board,name),s)) fail('State verification failed. Reload before retrying.')
+  cache$version<-pins::pin_meta(board,name)$local$version;cache$value<-s
  })
 }
 new_store <- function(backend,cfg) {

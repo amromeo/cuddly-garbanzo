@@ -27,3 +27,5 @@ jobs:
         working-directory: pilot
       - run: OLSD_USE_RENV=true python tests/run_browser.py
         working-directory: pilot
+      - run: OLSD_USE_RENV=true OLSD_BROWSER_SCALE=true python tests/run_browser.py
+        working-directory: pilot

@@ -20,6 +20,9 @@ server<-function(input,output,session) {
  actor<-actor_for(session,cfg);token<-session$token
  s<-reactiveVal(store$read());view<-reactiveVal('worklist');test_id<-reactiveVal(NULL);tab<-reactiveVal('To review');origin<-reactiveVal('To review')
  carried<-reactiveVal(NULL);queue<-reactiveVal(character());walking<-reactiveVal(FALSE);walk_saved<-reactiveVal(character());edits<-reactiveVal(character());drafts<-reactiveVal(list());upload<-reactiveVal(NULL);export_plan<-reactiveVal(list());action_pending<-reactiveVal(NULL);message<-reactiveVal('');source_error<-reactiveVal('')
+ source_snapshot<-reactiveVal(NULL);row_limit<-reactiveVal(50L)
+ index<-reactive(worklist_index(s()))
+ options<-reactive(mapping_options(s(),source_snapshot()$rows))
  revision<-reactiveVal(isolate(s())$revision)
  notify<-function(x) message(x)
  attempt<-function(fn) tryCatch(fn(),error=function(e) {showNotification(conditionMessage(e),type='error',duration=NULL);FALSE})
@@ -37,37 +40,32 @@ server<-function(input,output,session) {
   if(nzchar(source_error())) tags$p(class='warning',source_error()),
   if(actor$user!=cfg$writer) tags$p('Viewing only. The designated pilot operator makes changes.'),
   if(nzchar(message())) tags$p(role='status',message())))
- observeEvent(TRUE,{
-  if(nzchar(cfg$source_pin)&&pins::pin_exists(board,cfg$source_pin)) {
-   attempt(function(){src<-read_epic_pin(board,cfg$source_pin);source_error(if(!identical(src$reference$hash,s()$sources$epic$hash)) 'A newer Epic source is available. The pilot operator can apply it.' else '')})
-  }
- },once=TRUE)
- observe({invalidateLater(60000,session);tryCatch({
-  if(pins::pin_exists(board,cfg$source_pin)) {src<-read_epic_pin(board,cfg$source_pin)
+ observe({invalidateLater(60000,session);isolate(tryCatch({
+  if(pins::pin_exists(board,cfg$source_pin)) {src<-read_epic_pin(board,cfg$source_pin);source_snapshot(src)
    if(!identical(src$reference$hash,s()$sources$epic$hash)) {
     if(identical(actor$user,cfg$writer)&&!isTRUE(input$pilot_dirty)&&!length(drafts())&&length(s()$tests)) {
      tryCatch({write(function(st) apply_epic(st,src$rows,src$reference,actor));source_error('')},error=function(e) source_error(paste('A newer Epic source is available.',conditionMessage(e))))
     } else source_error('A newer Epic source is available. Save your work, then apply it.')
    }
    else if(difftime(Sys.time(),as.POSIXct(src$fetched_at,format='%Y-%m-%dT%H:%M:%OSZ',tz='UTC'),units='hours')>30) source_error('The Epic source check is overdue.') else source_error('');status_pin<-paste0(cfg$source_pin,'-status');if(pins::pin_exists(board,status_pin)&&identical(pins::pin_read(board,status_pin)$ok,FALSE)) source_error('The nightly Epic refresh failed. Last successful source retained; contact the administrator.')}
- },error=function(e) source_error(paste('Epic source unavailable; retaining the last successful version.',conditionMessage(e))))})
+ },error=function(e) source_error(paste('Epic source unavailable; retaining the last successful version.',conditionMessage(e)))))})
  observe({
   invalidateLater(5000,session)
-  tryCatch({latest<-store$read();if(latest$revision!=revision()) {
+  isolate(tryCatch({latest<-store$read();if(latest$revision!=revision()) {
    if(!length(drafts())&&!isTRUE(input$pilot_dirty)) {s(latest);revision(latest$revision)}
    else source_error('Newer saved work is available. Reload saved state to compare it with your unsaved choices.')
-  }},error=function(e) source_error(paste('Saved state unavailable. Your current work is retained.',conditionMessage(e))))
+  }},error=function(e) source_error(paste('Saved state unavailable. Your current work is retained.',conditionMessage(e)))))
  })
  selected<-reactive(input$selected%||%character())
  rows<-reactive({
   ts<-s()$tests;q<-tolower(input$search%||%'');filter<-input$lab%||%'All'
   if(nzchar(q)) ts<-Filter(function(t) grepl(q,tolower(paste(t$olsd$name,t$number,t$id)),fixed=TRUE),ts)
-  else ts<-Filter(function(t) {st<-status(s(),t);switch(tab(),'To review'=st%in%c('To review','Waiting on mapping'),'To approve'=st=='To approve','To download'=st=='To download','Kept wording'=st=='Kept wording','Set aside'=st=='Set aside','Source issues'=st=='Source issues',TRUE)},ts)
-  if(filter!='All') ts<-Filter(function(t) identical(t$section,filter),ts)
+  else ts<-Filter(function(t) {st<-index()$statuses[[t$id]];switch(tab(),'To review'=st%in%c('To review','Waiting on mapping'),'To approve'=st=='To approve','To download'=st=='To download','Kept wording'=st=='Kept wording','Set aside'=st=='Set aside','Source issues'=st=='Source issues',TRUE)},ts)
+  if(filter!='All') ts<-Filter(function(t) filter%in%trimws(unlist(strsplit(if(!is.null(t$linked_procedures)) t$linked_procedures$sections else t$section,';',fixed=TRUE))),ts)
   if(tab()=='To review'&&!nzchar(q)) ts<-ts[order(vapply(ts,function(t) {n<-length(open_fields(t));if(length(t$blocked)) 5 else if(n>1) 1 else if('name'%in%open_fields(t)) 2 else if('labs'%in%open_fields(t)) 3 else 4},numeric(1)))]
   ts
  })
- observeEvent(list(input$search,input$lab),{session$sendCustomMessage('selectRows',character())},ignoreInit=TRUE)
+ observeEvent(list(input$search,input$lab,tab()),{row_limit(50L);session$sendCustomMessage('selectRows',character())},ignoreInit=TRUE)
  current<-reactive(s()$tests[[test_id()]])
  capture<-function() {
   if(view()!='test'||is.null(current())) return()
@@ -95,7 +93,7 @@ server<-function(input,output,session) {
   if(finish||is.na(i)||i+direction>length(q)) {remaining<-sum(vapply(s()$tests[q],function(t) length(open_fields(t))>0,logical(1)));notify(paste(length(walk_saved()),'tests saved ·',remaining,'still need a choice'));navigate('worklist',guard=TRUE)}
   else if(i+direction>0) navigate('test',q[[i+direction]],guard=TRUE)
  }
- output$filters<-renderUI(if(view()=='worklist') tags$div(class='filters',textInput('search','Search all tests',value=isolate(input$search)%||%''),selectInput('lab','Lab section',c('All',sort(unique(vapply(s()$tests,function(t)t$section,character(1))))),selected=isolate(input$lab)%||%'All')))
+ output$filters<-renderUI(if(view()=='worklist') tags$div(class='filters',textInput('search','Search all tests',value=isolate(input$search)%||%''),selectInput('lab','Lab section',c('All',options()$sections),selected=isolate(input$lab)%||%'All')))
  section_for<-function(t) {
   if(isTRUE(t$source_conflict)) return('Procedure assignments')
   if(length(t$blocked)) return('Waiting on lab names')
@@ -103,8 +101,7 @@ server<-function(input,output,session) {
   if(length(keys)>1) 'More than one change' else if('name'%in%keys) 'Name changes' else if('labs'%in%keys) 'Lab changes' else 'Other changes'
  }
  worklist<-function() {
-  ts<-rows();statuses<-vapply(s()$tests,function(t) status(s(),t),character(1));counts<-table(statuses)
-  counts['To review']<-sum(statuses%in%c('To review','Waiting on mapping'))
+  ts<-rows();counts<-index()$counts;visible<-head(names(ts),row_limit())
   row<-function(t) tags$tr(
    tags$td(tags$input(type='checkbox',class='row-select',value=t$id,checked=if(t$id%in%isolate(selected())) 'checked' else NULL,`aria-label`=paste('Select',t$olsd$name))),
    tags$td(button(t$olsd$name,'open',t$id),tags$p(paste(t$number,'·',t$id,'·',t$section))),
@@ -116,20 +113,20 @@ server<-function(input,output,session) {
      if(k%in%c('name','labs')&&!k%in%t$blocked) tagList(button('Use Epic','inline_epic',t$id,k,class=if(identical(staged$choice,'epic')) 'active' else ''),button('Keep','inline_olsd',t$id,k,class=if(identical(staged$choice,'olsd')) 'active' else '')) else tags$p('Open this test to review the change.'),
      if(identical(t$choices[[k]]$choice,'later')) tags$p(paste('Set aside:',t$choices[[k]]$note)))
    }),lapply(setdiff(names(t$choices),open_fields(t)),function(k) tags$p(paste(fields[[k]],t$choices[[k]]$choice,t$proposed[[k]],t$choices[[k]]$note)))),
-   tags$td(status(s(),t)))
+   tags$td(index()$statuses[[t$id]]))
   table_rows<-if(tab()=='To review'&&!nzchar(input$search%||%'')) lapply(c('More than one change','Name changes','Lab changes','Other changes','Procedure assignments','Waiting on lab names'),function(group) {
    members<-Filter(function(t) section_for(t)==group,ts)
-   if(length(members)) tagList(tags$tr(tags$th(colspan=4,paste(group,'·',length(members)),button('Select section','select_group',group))),lapply(members,row))
-  }) else lapply(ts,row)
+   if(length(members)) tagList(tags$tr(tags$th(colspan=4,paste(group,'·',length(members)),button('Select section','select_group',group))),lapply(members[intersect(names(members),visible)],row))
+  }) else lapply(ts[visible],row)
   tagList(tags$h1('Catalog worklist'),tags$div(class='tabs',lapply(c('To review','To approve','To download','Kept wording','Set aside','Source issues','All tests'),function(x) button(paste(x,if(x=='All tests') length(s()$tests) else if(x%in%names(counts)) unname(counts[x]) else 0),'tab',x,class=if(tab()==x) 'active' else ''))),
    tags$p(paste(length(ts),'of',if(nzchar(input$search%||%'')) length(s()$tests) else if(tab()=='All tests') length(s()$tests) else if(tab()%in%names(counts)) counts[tab()] else 0,'tests')),
-   tags$p(paste('Open changes:',sum(vapply(s()$tests,function(t) 'name'%in%open_fields(t),logical(1))),'names ·',sum(vapply(s()$tests,function(t) 'labs'%in%open_fields(t),logical(1))),'labs ·',sum(vapply(s()$tests,function(t) length(t$blocked)>0,logical(1))),'mapping problems')),
+   tags$p(paste('Open changes:',index()$names,'names ·',index()$labs,'labs ·',index()$blocked,'mapping problems')),
    button('Apply latest Epic source','apply_source'),
-   tags$div(class='selection',button('Select all shown','select_all'),button('Clear selection','clear_selection'),button('Review one by one','walk'),
+   tags$div(class='selection',button(paste('Select all',length(ts),'matching tests'),'select_all'),button('Clear selection','clear_selection'),button('Review one by one','walk'),
     if(tab()=='To review') tagList(button('Use Epic for selected name/lab changes','bulk_epic'),button('Keep what is in the OLSD','bulk_olsd'),button('Decide later','bulk_later')),
     if(tab()=='To approve') tagList(button('Approve selected tests','approve_selected'),button('Send selected back to review','send_selected')),
     if(tab()=='To download') tagList(button('Prepare selected Excel files','prepare'),button('Withdraw selected approvals','send_selected'))),
-   tags$table(class='worklist',tags$thead(tags$tr(tags$th('Select'),tags$th('Catalog test'),tags$th('Changes and saved choices'),tags$th('Status'))),tags$tbody(table_rows)))
+   tags$table(class='worklist',tags$thead(tags$tr(tags$th('Select'),tags$th('Catalog test'),tags$th('Changes and saved choices'),tags$th('Status'))),tags$tbody(table_rows)),if(length(visible)<length(ts)) tagList(tags$p(paste('Showing',length(visible),'of',length(ts),'matching tests')),button('Show 50 more tests','show_more')))
  }
  field_cards<-function(t,k) {
   d<-isolate(drafts()[[t$id]][[k]]);options<-c('Keep what is in the OLSD'='olsd')
@@ -178,7 +175,7 @@ server<-function(input,output,session) {
  }),tags$p('A matching snapshot confirms the values observed on that date; it does not prove real-time publication.'))
  output$page<-renderUI(switch(view(),worklist=worklist(),test=testpage(),
   snapshot=tagList(tags$h1('Update OLSD snapshot'),fileInput('snapshot_file','OLSD Excel export',accept='.xlsx'),uiOutput('snapshot_preview')),
-  mappings=tagList(tags$h1('Lab mappings'),tags$p('Shared changes are applied to affected tests for review.'),tableOutput('mapping_table'),textInput('section','Epic section'),textInput('public_lab','Public laboratory name'),textInput('category','Approved category'),button('Save shared mapping','save_mapping')),
+  mappings=tagList(tags$h1('Lab mappings'),tags$p('Shared changes are applied to affected tests for review.'),tableOutput('mapping_table'),uiOutput('mapping_form')),
   downloads=downloadspage()))
  observeEvent(s(),{
   for(x in s()$exports) local({item<-x;output[[paste0('history_',item$id)]]<-downloadHandler(filename=function() item$filename,content=function(file) {
@@ -189,6 +186,20 @@ server<-function(input,output,session) {
    file.copy(paths[[1]],file,overwrite=TRUE)
   })})
  },ignoreInit=FALSE)
+ output$mapping_form<-renderUI({
+  choices<-options();section<-isolate(input$section)%||%''
+  if(!section%in%choices$sections) section<-''
+  existing<-s()$mappings[s()$mappings$section==section,,drop=FALSE]
+  tagList(selectInput('section','Epic section',choices=c('Select an Epic section'='',choices$sections),selected=section,selectize=FALSE),
+   selectizeInput('public_lab','Public laboratory name',choices=c('Select or enter a laboratory'='',choices$labs),selected=if(nrow(existing)) existing$lab[[1]] else '',options=list(create=TRUE)),
+   selectizeInput('category','Search category',choices=c('Select or enter a category'='',choices$categories),selected=if(nrow(existing)) existing$category[[1]] else '',options=list(create=TRUE)),
+   tags$p('Choices come from your source data and saved mappings. Select a section to edit its saved mapping. New names require your explicit entry; similar names are not automatically matched.'),button('Save shared mapping','save_mapping'))
+ })
+ observeEvent(input$section,{
+  section<-input$section;existing<-s()$mappings[s()$mappings$section==section,,drop=FALSE]
+  updateSelectizeInput(session,'public_lab',selected=if(nrow(existing)) existing$lab[[1]] else '')
+  updateSelectizeInput(session,'category',selected=if(nrow(existing)) existing$category[[1]] else '')
+ },ignoreNULL=TRUE)
  output$mapping_table<-renderTable(s()$mappings)
  output$snapshot_preview<-renderUI(if(!is.null(upload())) tagList(tags$p(paste(nrow(upload()$rows),'tests; accepting this snapshot may return affected tests to review.')),tableOutput('upload_table'),button('Accept snapshot','accept_snapshot')))
  output$upload_table<-renderTable(if(!is.null(upload())) head(preview_olsd(s(),upload()$rows),50))
@@ -226,6 +237,7 @@ server<-function(input,output,session) {
   if(a=='back') {capture();sole<-identical(carried(),test_id())&&length(drafts())==1&&identical(names(drafts()),test_id());navigate('worklist',guard=!sole);carried(NULL);return()}
   if(a=='walk') {q<-intersect(names(rows()),selected());if(!length(q)) q<-names(rows());if(!length(q)) return();queue(q);walking(TRUE);walk_saved(character());origin(tab());navigate('test',q[[1]]);return()}
   if(a=='next') {step(1);return()};if(a=='previous') {step(-1);return()}
+  if(a=='show_more') {row_limit(row_limit()+50L);return()}
   if(a=='select_group') {ids<-names(Filter(function(t) section_for(t)==id,rows()));session$sendCustomMessage('selectRows',unique(c(selected(),ids)));return()}
   if(a=='select_all') {session$sendCustomMessage('selectRows',names(rows())%||%character());return()}
   if(a=='clear_selection') {session$sendCustomMessage('selectRows',character());return()}
