@@ -54,3 +54,7 @@ Lab mapping controls are populated from distinct Epic sections, observed OLSD la
 The worklist initially renders 50 matching entries, with Show 50 more for additional rows. Counts, section selection, bulk actions, and review queues still operate on all matching entries. Status/count calculations are cached until saved state changes, and unchanged state-pin versions are served from memory. Background pin polling runs on timers rather than navigation/input invalidations.
 
 Run the synthetic 1,542-entry navigation/selection check with `OLSD_BROWSER_SCALE=true OLSD_USE_RENV=true python tests/run_browser.py`. Its timings describe the test environment, not a guaranteed institutional response time.
+
+Lab/category choices decode HTML and entities before splitting values, preventing font/style fragments from becoming options. Case/whitespace-only variants are consolidated for the selector; differently worded names remain separate. Raw snapshot values and saved mappings are not rewritten by this display cleanup. Saving a mapping is still explicit. This uses the `xml2` dependency in the lockfile.
+
+To prepare a lab-name review file, stop Shiny and run `source("scripts/export_lab_review.R")` from the project root in the same R session/data-folder configuration. It writes `lab-name-review.xlsx` with raw OLSD lab values and counts, distinct Epic sections, and saved mappings. It does not query the warehouse or change any pins. Raw HTML is preserved for inspection; no SQL or credentials are included. The workbook is ignored by Git.

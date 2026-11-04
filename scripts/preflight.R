@@ -1,6 +1,6 @@
 source('R/core.R');source('R/storage.R');source('R/sources.R')
 cfg<-config()
-for(p in c('shiny','pins','readxl','openxlsx','jsonlite','digest','filelock')) if(!requireNamespace(p,quietly=TRUE)) fail(paste('Missing package:',p))
+for(p in c('shiny','pins','readxl','openxlsx','jsonlite','digest','filelock','xml2')) if(!requireNamespace(p,quietly=TRUE)) fail(paste('Missing package:',p))
 if(cfg$hosted) {
  if(cfg$backend!='connect') fail('Connect deployments require Connect pins.')
  if(!nzchar(cfg$writer)) fail('Set OLSD_WRITER_USER to the designated operator.')

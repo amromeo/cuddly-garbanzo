@@ -78,18 +78,46 @@ preview_olsd <- function(s,rows) {
  },character(1)))
 }
 
+catalog_plain_text <- function(values) {
+ vapply(as.character(values),function(value) {
+  if(is.na(value)) return('')
+  # Decode before splitting: semicolons inside styles/entities are not labs.
+  for(pass in seq_len(3L)) {
+   if(!grepl('<[A-Za-z/!]|&(?:[A-Za-z][A-Za-z0-9]+|#[0-9]+|#x[0-9A-Fa-f]+);',value,perl=TRUE)) break
+   html<-gsub('<br\\s*/?>','\n',value,ignore.case=TRUE,perl=TRUE)
+   html<-gsub('(</(?:p|div|li|tr|h[1-6])\\s*>)','\\1\n',html,ignore.case=TRUE,perl=TRUE)
+   doc<-xml2::read_html(paste0('<html><body>',html,'</body></html>'),options=c('RECOVER','NOERROR','NOWARNING','NONET'))
+   xml2::xml_remove(xml2::xml_find_all(doc,'//script|//style'))
+   decoded<-xml2::xml_text(xml2::xml_find_first(doc,'//body'))
+   if(identical(decoded,value)) break
+   value<-decoded
+  }
+  value<-gsub('\r\n?','\n',value)
+  value<-gsub('[\\p{Zs}\t\f\v]+',' ',value,perl=TRUE)
+  trimws(value,whitespace='[\\h\\v]')
+ },character(1),USE.NAMES=FALSE)
+}
+map_selected <- function(value,choices) {
+ clean<-catalog_plain_text(value%||%'')
+ hit<-match(tolower(clean),tolower(choices))
+ if(length(hit)&&!is.na(hit)) unname(choices[[hit]]) else ''
+}
+
 mapping_options <- function(s,epic_rows=NULL) {
- split_values<-function(x,pattern) {
+ split_values<-function(x,pattern,clean=FALSE) {
   x<-unlist(x,use.names=FALSE);x<-x[!is.na(x)]
+  if(clean) x<-catalog_plain_text(unique(x))
   values<-trimws(unlist(strsplit(as.character(x),pattern,perl=TRUE),use.names=FALSE))
-  sort(unique(values[nzchar(values)]))
+  values<-values[nzchar(values)]
+  if(clean) values<-values[!duplicated(tolower(values))]
+  sort(unique(values))
  }
  sections<-c(s$mappings$section,epic_rows$sections,lapply(s$tests,function(t) {
   if(!is.null(t$linked_procedures)) t$linked_procedures$sections else t$section
  }))
  list(sections=split_values(sections,';'),
- labs=split_values(c(s$mappings$lab,lapply(s$tests,function(t) t$olsd$labs)),'\\r?\\n|;|<br\\s*/?>'),
- categories=split_values(c(s$categories,s$mappings$category,lapply(s$tests,function(t)t$olsd$categories)),';'))
+ labs=split_values(c(s$mappings$lab,lapply(s$tests,function(t) t$olsd$labs)),'\\r?\\n|;',clean=TRUE),
+ categories=split_values(c(s$mappings$category,s$categories,lapply(s$tests,function(t)t$olsd$categories)),';|\\r?\\n',clean=TRUE))
 }
 worklist_index <- function(s) {
  statuses<-vapply(s$tests,function(t) status(s,t),character(1));counts<-table(statuses)
