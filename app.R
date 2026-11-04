@@ -240,7 +240,7 @@ server<-function(input,output,session) {
   }
   if(a%in%c('approve','approve_selected')) {capture();if(length(drafts())) fail('Save choices before approving.');ids<-if(a=='approve') id else selected();write(function(st) approve_tests(st,ids,actor));notify('Selected tests approved. Approval does not upload or publish to OLSD.');if(walking()&&origin()=='To approve') step(1);return()}
   if(a%in%c('withdraw','send_selected')) {ids<-if(a=='withdraw') id else selected();write(function(st) send_back(st,ids,actor));notify('Returned to review. Earlier unconfirmed files are out of date; do not import them.');return()}
-  if(a=='accept_snapshot') {capture();if(length(drafts())) fail('Save or discard choices before accepting a snapshot.');require_role(actor,TRUE);req(upload());u<-upload();store$claim(actor,token);snapshot_pin<-paste0(cfg$pin,'-snapshot-',u$reference$hash);if(!pins::pin_exists(board,snapshot_pin)) pin_write_versioned(board,u$rows,snapshot_pin);u$reference$pin<-snapshot_pin;u$reference$version<-pins::pin_meta(board,snapshot_pin)$local$version;write(function(st) apply_olsd(st,u$rows,u$reference,actor),TRUE);upload(NULL);notify('Snapshot accepted. Review affected tests.');return()}
+  if(a=='accept_snapshot') {capture();if(length(drafts())) fail('Save or discard choices before accepting a snapshot.');require_role(actor,TRUE);req(upload());u<-upload();store$claim(actor,token);snapshot_pin<-artifact_pin_name(cfg,'snapshot',u$reference$hash);if(!pins::pin_exists(board,snapshot_pin)) pin_write_versioned(board,u$rows,snapshot_pin);u$reference$pin<-snapshot_pin;u$reference$version<-pins::pin_meta(board,snapshot_pin)$local$version;write(function(st) apply_olsd(st,u$rows,u$reference,actor),TRUE);upload(NULL);notify('Snapshot accepted. Review affected tests.');return()}
   if(a=='apply_source') {capture();if(length(drafts())) fail('Save or discard choices before applying a source update.');src<-read_epic_pin(board,cfg$source_pin);write(function(st) apply_epic(st,src$rows,src$reference,actor));source_error('');notify('Latest Epic source applied.');return()}
   if(a=='assign_procedure') {
    capture();if(length(drafts())) fail('Save or discard choices before changing the procedure assignment.')
@@ -262,7 +262,7 @@ server<-function(input,output,session) {
    for(i in seq_along(plans)) local({j<-i;output[[paste0('file_',j)]]<-downloadHandler(filename=function() plans[[j]]$filename,content=function(file) {
     x<-plans[[j]];fresh<-store$read();if(fresh$revision!=revision()) fail('Saved state changed. Reload and prepare files again.')
     for(tid in names(x$rows)) if(!ready(fresh$tests[[tid]])||!identical(fresh$tests[[tid]]$approval$id,x$rows[[tid]]$approval_id)) fail('Approval changed.')
-    pin<-paste0(cfg$pin,'-export-',x$id);pins::pin_upload(board,x$path,name=pin,versioned=TRUE)
+    pin<-artifact_pin_name(cfg,'export',x$id);pins::pin_upload(board,x$path,name=pin,versioned=TRUE)
     write(function(st) record_download(st,x,actor,list(pin=pin,hash=x$hash)))
     file.copy(x$path,file,overwrite=TRUE)
    },contentType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')})

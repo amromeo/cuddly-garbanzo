@@ -73,3 +73,12 @@ acquire_process_lock <- function(cfg) {
  if(is.null(lock)) fail('Another application worker is running. The pins pilot requires one process.')
  lock
 }
+
+artifact_pin_name <- function(cfg,kind,identity) {
+ if(!kind%in%c('snapshot','export')) fail('Unknown artifact kind.')
+ # pins repeats a pin name in its directory and filename. Keep new artifact
+ # names short enough for Windows; full identity remains in the state record.
+ key<-digest::digest(list(namespace=cfg$pin,kind=kind,identity=identity),algo='sha256')
+ scope<-if(cfg$backend=='connect'&&grepl('/',cfg$pin,fixed=TRUE)) paste0(sub('/[^/]+$','',cfg$pin),'/') else ''
+ paste0(scope,if(kind=='snapshot') 'snap-' else 'file-',substr(key,1,24))
+}
