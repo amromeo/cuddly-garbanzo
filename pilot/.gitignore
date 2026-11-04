@@ -9,3 +9,5 @@ local-pins/
 *.xlsx
 *.csv
 rsconnect/
+# Institutional queries are tracked only in the private downstream repository.
+*.sql

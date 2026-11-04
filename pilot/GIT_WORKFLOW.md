@@ -1,5 +1,7 @@
 # Pull public updates; push institutional changes
 
+**If `app.R` is at your institutional repository root, use [ROOT_LAYOUT_UPDATES.md](ROOT_LAYOUT_UPDATES.md) for the correct branch and one-time history alignment.**
+
 Use one local working copy with two remotes:
 
 - `upstream`: public source code maintained by the assistant.

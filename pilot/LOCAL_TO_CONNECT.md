@@ -1,5 +1,7 @@
 # Local development → institutional Git → Posit Connect
 
+**If `app.R` is at your institutional repository root, use [ROOT_LAYOUT_UPDATES.md](ROOT_LAYOUT_UPDATES.md) for the correct branch and one-time history alignment.**
+
 For recurring updates after initial setup, follow [GIT_WORKFLOW.md](GIT_WORKFLOW.md): fetch from the public `upstream`, keep institutional changes on your branch, and push to institutional `origin`.
 
 This workflow is supported. Start from the supplied source archive: the `production/posit-connect-pilot` branch was committed in the cloud workspace, but has not been pushed to the public GitHub repository. Extract the archive and copy `pilot/` into your institutional repository. Keep development content and pins separate from any existing live app.
