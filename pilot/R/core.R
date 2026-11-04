@@ -31,6 +31,7 @@ current_export <- function(s,t) {
  if(length(hits)) hits[[length(hits)]] else NULL
 }
 status <- function(s,t) {
+ if(isTRUE(t$source_conflict)) return('To review')
  if(length(t$blocked)) return('Waiting on mapping')
  if(length(open_fields(t))) return(if(is_deferred(t)) 'Set aside' else 'To review')
  if(ready(t)) {x<-current_export(s,t);if(!is.null(x)) return(if(confirmed_row(x,t$id)) 'Confirmed in OLSD' else 'Downloaded');return('To download')}
@@ -141,12 +142,29 @@ apply_olsd <- function(s,rows,source,actor) {
  s$sources$olsd<-source;record(s,actor,'Accepted OLSD snapshot',after=source)
 }
 apply_epic <- function(s,rows,source,actor) {
- for(i in seq_len(nrow(rows))) {
-  r<-rows[i,,drop=FALSE];id<-r$id;t<-s$tests[[id]];if(is.null(t)) next
+ rows<-validate_epic(rows)
+ s$source_assignments<-s$source_assignments%||%list()
+ for(id in unique(rows$id)) {
+  group<-rows[rows$id==id,,drop=FALSE];t<-s$tests[[id]];if(is.null(t)) next
+  previous_links<-t$linked_procedures
+  t$linked_procedures<-group
+  primary<-s$source_assignments[[id]]
+  normalized_sections<-vapply(strsplit(group$sections,';',fixed=TRUE),function(x) paste(sort(unique(trimws(x))),collapse=';'),character(1))
+  conflict<-(!is.null(primary)&&!primary%in%group$epic_id)||(is.null(primary)&&(length(unique(group$name))>1||length(unique(normalized_sections))>1))
+  if(conflict) {
+   t$source_conflict<-TRUE;t$blocked<-c('name','labs','categories');t$epic_id<-paste(group$epic_id,collapse=', ');t$section<-paste(unique(group$sections),collapse=' | ');t$sources$epic<-source
+   for(k in c('name','labs','categories')) {t$epic[k]<-list(NULL);t$pending[[k]]<-list(source='Procedure assignment',before=t$olsd[[k]],after=NULL,saved=t$proposed[[k]])}
+   if(!is.null(t$approval)) t$approval$outdated<-TRUE
+   if(!identical(previous_links,group)) s<-retire(s,id,'Linked Epic procedures need an administrator source assignment.')
+   s$tests[[id]]<-t;next
+  }
+  r<-if(!is.null(primary)) group[group$epic_id==primary,,drop=FALSE] else group[1,,drop=FALSE]
+  t$source_conflict<-FALSE
   sections<-trimws(strsplit(r$sections,';',fixed=TRUE)[[1]]);m<-s$mappings[match(sections,s$mappings$section),,drop=FALSE]
   blocked<-!length(sections)||anyNA(m$lab)||any(!nzchar(m$lab))
   vals<-list(name=r$name,labs=if(blocked) NULL else paste(unique(m$lab),collapse='\n'),categories=if(blocked) NULL else paste(unique(m$category[nzchar(m$category)]),collapse=';'))
-  t$shared_procedure<-sum(rows$epic_id==r$epic_id)>1;t$link_label<-r$link_label%||%'';t$link_url<-r$link_url%||%'';t$sources$epic<-source;t$epic_id<-r$epic_id;t$section<-r$sections;t$blocked<-if(blocked) 'labs' else character()
+  t$shared_procedure<-any(vapply(group$epic_id,function(p) length(unique(rows$id[rows$epic_id==p]))>1,logical(1)));t$link_label<-r$link_label%||%'';t$link_url<-r$link_url%||%'';t$sources$epic<-source;t$epic_id<-r$epic_id;t$section<-r$sections;t$blocked<-if(blocked) 'labs' else character()
+  for(k in names(vals)) if(identical(t$pending[[k]]$source,'Procedure assignment')&&same(vals[[k]],t$proposed[[k]],k)) t$pending[[k]]<-NULL
   for(k in names(vals)) {
    v<-vals[[k]]
    if(!same(v,t$epic[[k]],k)) {
@@ -162,6 +180,15 @@ apply_epic <- function(s,rows,source,actor) {
   if(blocked) t$pending$labs<-list(source='Lab mapping',before=t$olsd$labs,after=NULL)
   s$tests[[id]]<-t
  }
+ for(id in setdiff(names(s$tests),unique(rows$id))) {
+  t<-s$tests[[id]]
+  if(!is.null(t$linked_procedures)&&nrow(t$linked_procedures)) {
+   t$linked_procedures<-rows[FALSE,,drop=FALSE];t$source_conflict<-TRUE;t$blocked<-c('name','labs','categories');t$sources$epic<-source
+   for(k in t$blocked) {t$epic[k]<-list(NULL);t$pending[[k]]<-list(source='Procedure assignment',before=t$olsd[[k]],after=NULL,saved=t$proposed[[k]])}
+   if(!is.null(t$approval)) t$approval$outdated<-TRUE
+   s<-retire(s,id,'This OLSD entry no longer has a linked Epic procedure.');s$tests[[id]]<-t
+  }
+ }
  s$sources$epic<-source;record(s,actor,'Applied Epic source',after=source)
 }
 
@@ -171,4 +198,14 @@ display_date <- function(value) {
  if(is.na(time)) return('Not recorded')
  days<-max(0,floor(as.numeric(difftime(Sys.time(),time,units='days'))))
  paste0(format(time,'%b %d, %Y, %I:%M %p %Z',tz='America/New_York'),' (',if(days==0) 'today' else paste(days,if(days==1) 'day old' else 'days old'),')')
+}
+
+assign_procedure <- function(s,id,procedure,rows,source,actor) {
+ require_role(actor,TRUE)
+ if(!id%in%names(s$tests)||!procedure%in%rows$epic_id[rows$id==id]) fail('Choose a procedure currently linked to this OLSD entry.')
+ previous<-s$source_assignments[[id]]
+ s$source_assignments[[id]]<-procedure
+ s<-retire(s,id,'The primary Epic procedure assignment changed.');s$tests[[id]]$approval<-NULL
+ s<-record(s,actor,'Assigned primary Epic procedure',id,before=previous,after=procedure)
+ apply_epic(s,rows,source,actor)
 }
