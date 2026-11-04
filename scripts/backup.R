@@ -1,0 +1,5 @@
+source('R/core.R');source('R/storage.R')
+args<-commandArgs(TRUE);if(length(args)!=1) fail('Usage: Rscript scripts/backup.R /restricted/path/backup.rds')
+cfg<-config();s<-pin_backend(board_for(cfg),cfg$pin)$read();saveRDS(s,args[[1]])
+if(!identical(readRDS(args[[1]]),s)) fail('Backup verification failed.')
+cat('Verified backup at revision',s$revision,'\n')

@@ -1,0 +1,11 @@
+.Rhistory
+.RData
+.Rproj.user/
+.Renviron
+renv/library/
+renv/staging/
+local-pins/
+*.rds
+*.xlsx
+*.csv
+rsconnect/

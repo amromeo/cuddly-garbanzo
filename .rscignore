@@ -1,0 +1,6 @@
+tests/
+local-pins/
+.Renviron
+.Rhistory
+.RData
+.git/

@@ -1,0 +1,7 @@
+source('R/core.R');source('R/storage.R');source('R/sources.R');source('R/migration.R')
+args<-commandArgs(TRUE)
+if(length(args)!=2) fail('Usage: Rscript scripts/migrate_preview.R legacy-backup.rds /restricted/candidate-directory')
+if(!dir.exists(args[[2]])) dir.create(args[[2]],recursive=TRUE)
+result<-migrate_legacy(readRDS(args[[1]]),list(user='migration-preview',role='admin'))
+saveRDS(result$state,file.path(args[[2]],'candidate.rds'));write.csv(result$report,file.path(args[[2]],'review.csv'),row.names=FALSE)
+cat('Candidate saved for review. No Connect pin was changed. Legacy history remains archived in the candidate.\n')
