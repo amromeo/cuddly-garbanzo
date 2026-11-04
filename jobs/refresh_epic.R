@@ -10,7 +10,7 @@ tryCatch({
   source('jobs/helix_direct.R');raw<-read_helix_sql()
  }
  normalized<-normalize_helix(as.data.frame(raw,check.names=FALSE))
- payload<-list(schema=1L,fetched_at=now(),rows=normalized$rows,excluded=normalized$excluded,hash=digest::digest(normalized$rows,algo='sha256'))
+ payload<-list(schema=1L,fetched_at=now(),rows=normalized$rows,excluded=normalized$excluded,issues=normalized$issues,hash=digest::digest(normalized$rows,algo='sha256'))
  pins::pin_write(board,payload,name=cfg$source_pin,type='rds',versioned=TRUE)
  pins::pin_write(board,list(ok=TRUE,at=now(),rows=nrow(payload$rows)),name=paste0(cfg$source_pin,'-status'),type='rds',versioned=TRUE)
 },error=function(e){

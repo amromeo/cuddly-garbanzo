@@ -124,3 +124,5 @@ Have administrators enforce one application process and one replica before setti
 Open the app and complete the first durable save, then disable `OLSD_INITIALIZE` so a missing pin becomes an error. If migrating existing editorial content, follow `DEPLOYMENT.md` instead of initializing over an existing pin. Validate authenticated identity, a second session's write block, restart persistence, and a supervised Excel import/reconciliation cycle before expanding the pilot.
 
 Deploy the pilot as separate content with separate pins after development acceptance. Never put database passwords or Connect API keys in `manifest.json`: manifests describe code/dependencies, not runtime secrets.
+
+After normalization, inspect `validated$issues` for missing-name source records and `validated$excluded` for procedures without an OLSD link. Missing-name records are retained for later correction instead of stopping the source refresh. Linked entries needing correction appear under Source issues in the app; complete entries can proceed independently.

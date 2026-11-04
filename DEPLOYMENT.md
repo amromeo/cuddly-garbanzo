@@ -71,3 +71,7 @@ Versioned pins retain historical state. Also create restricted independent backu
 To restore, stop the app, preserve a backup of its current state, and run `Rscript scripts/restore.R /restricted/backup.rds --app-stopped`. This validates schema, creates a new revision, and records the restore in history. Restoring a state cannot retract an Excel file already downloaded or imported: reconcile affected exports and fresh OLSD observations before resuming writes.
 
 For a failed release, disable writes, retain the current pin versions, and redeploy the previous compatible application bundle. Do not roll back to an older schema reader against a newer incompatible state. Keep the public static prototype available as a reference; it has no authority over real state.
+
+## Incomplete source records
+
+A missing Epic display name does not fail the complete refresh. The source payload retains affected linked rows in `issues`; procedures without an OLSD link remain in `excluded`. Inspect the app's **Source issues** tab separately from normal review. Do not insert a guessed name or silently drop the link. Correct the warehouse source later, or explicitly assign a complete linked procedure as primary. The app keeps existing OLSD/proposed content and prevents approval from incomplete source data. After correcting the query/source, rerun the source job and apply the new snapshot to resume review.

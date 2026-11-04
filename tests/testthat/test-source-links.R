@@ -46,3 +46,23 @@ test_that('an entry losing all source links returns to assignment review', {
  expect_true(s$tests[['1']]$source_conflict);expect_equal(nrow(s$tests[['1']]$linked_procedures),0)
  expect_false(s$tests[['2']]$source_conflict)
 })
+test_that('missing names are retained as source issues, not fatal feed errors', {
+ raw<-raw_links(c('https://example.org/Tests/1','https://example.org/Tests/2','No link'))
+ raw[['Procedure Display Name']]<-c(NA,'Complete name',NA)
+ x<-normalize_helix(raw)
+ expect_equal(nrow(x$rows),2);expect_equal(nrow(x$issues),1);expect_equal(x$issues$id,'1');expect_equal(nrow(x$excluded),1)
+ s<-apply_epic(fixture(2),x$rows,source_reference('Epic',x$rows),admin)
+ expect_equal(status(s,s$tests[['1']]),'Source issues');expect_equal(s$tests[['1']]$proposed$name,'Test 1');expect_false(can_approve(s$tests[['1']]))
+ expect_false(s$tests[['2']]$source_issue);expect_equal(s$tests[['2']]$epic$name,'Complete name')
+ expect_error(assign_procedure(s,'1','1',x$rows,source_reference('Epic',x$rows),admin),'no Epic display name')
+ x$rows$name[x$rows$id=='1']<-'Corrected name'
+ s<-apply_epic(s,x$rows,source_reference('Epic',x$rows),admin)
+ expect_false(s$tests[['1']]$source_issue);expect_equal(s$tests[['1']]$epic$name,'Corrected name')
+})
+test_that('a complete primary may drive an entry while incomplete alternate remains visible', {
+ raw<-raw_links(rep('https://example.org/Tests/1',2));raw[['Procedure Display Name']]<-c('', 'Complete name')
+ x<-normalize_helix(raw);s<-apply_epic(fixture(1),x$rows,source_reference('Epic',x$rows),admin)
+ expect_true(s$tests[['1']]$source_issue)
+ s<-assign_procedure(s,'1','2',x$rows,source_reference('Epic',x$rows),admin)
+ expect_false(s$tests[['1']]$source_issue);expect_equal(nrow(s$tests[['1']]$linked_procedures),2);expect_equal(s$tests[['1']]$epic$name,'Complete name')
+})
