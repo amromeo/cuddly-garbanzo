@@ -51,3 +51,11 @@ test_that('artifact paths stay short and distinct in nested local projects', {
  expect_false(identical(name,artifact_pin_name(list(pin='other-state',backend='folder'),'snapshot',identity)))
  expect_match(artifact_pin_name(list(pin='owner/state',backend='connect'),'export',identity),'^owner/file-')
 })
+test_that('cached reads observe newly published pin versions', {
+ board<-pins::board_folder(tempfile(),versioned=TRUE)
+ first<-pin_backend(board,'state',TRUE);first$write(new_state())
+ expect_equal(first$read()$revision,0)
+ second<-pin_backend(board,'state');value<-second$read();value$revision<-1L;second$write(value)
+ expect_equal(first$read()$revision,1)
+ expect_identical(first$read(),value)
+})

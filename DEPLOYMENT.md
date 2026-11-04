@@ -90,3 +90,9 @@ shiny::runApp(".")
 ```
 
 This starts a separate local store and leaves the previous folder intact. If there are saved drafts, approvals, or export history, stop the app and copy the existing store into the new location before using it; do not initialize a fresh store over existing work. The source-job and application must use the same `OLSD_DATA_DIR`. This local setting does not change Connect pin storage.
+
+## Mapping setup and larger worklists
+
+The Epic section selector uses distinct source sections. Laboratory and category selectors offer names observed in the uploaded OLSD snapshot and existing mappings; saved mappings are prefilled when their section is selected. Administrators may explicitly enter new names when needed. These are choices, not automatic crosswalks: selecting similar text never silently creates or approves a mapping.
+
+Large worklists render 50 entries initially. Show more expands the displayed list, while section counts, selection of all matching tests, and one-by-one review retain the complete matching set. Navigation reuses state-derived counts and cached immutable pin versions. Test with the institution's data volume and storage/network before pilot acceptance; the included scale check uses 1,542 synthetic entries.
