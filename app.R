@@ -97,6 +97,7 @@ server<-function(input,output,session) {
  }
  output$filters<-renderUI(if(view()=='worklist') tags$div(class='filters',textInput('search','Search all tests',value=isolate(input$search)%||%''),selectInput('lab','Lab section',c('All',sort(unique(vapply(s()$tests,function(t)t$section,character(1))))),selected=isolate(input$lab)%||%'All')))
  section_for<-function(t) {
+  if(isTRUE(t$source_conflict)) return('Procedure assignments')
   if(length(t$blocked)) return('Waiting on lab names')
   keys<-open_fields(t)
   if(length(keys)>1) 'More than one change' else if('name'%in%keys) 'Name changes' else if('labs'%in%keys) 'Lab changes' else 'Other changes'
@@ -116,7 +117,7 @@ server<-function(input,output,session) {
      if(identical(t$choices[[k]]$choice,'later')) tags$p(paste('Set aside:',t$choices[[k]]$note)))
    }),lapply(setdiff(names(t$choices),open_fields(t)),function(k) tags$p(paste(fields[[k]],t$choices[[k]]$choice,t$proposed[[k]],t$choices[[k]]$note)))),
    tags$td(status(s(),t)))
-  table_rows<-if(tab()=='To review'&&!nzchar(input$search%||%'')) lapply(c('More than one change','Name changes','Lab changes','Other changes','Waiting on lab names'),function(group) {
+  table_rows<-if(tab()=='To review'&&!nzchar(input$search%||%'')) lapply(c('More than one change','Name changes','Lab changes','Other changes','Procedure assignments','Waiting on lab names'),function(group) {
    members<-Filter(function(t) section_for(t)==group,ts)
    if(length(members)) tagList(tags$tr(tags$th(colspan=4,paste(group,'·',length(members)),button('Select section','select_group',group))),lapply(members,row))
   }) else lapply(ts,row)
@@ -142,12 +143,16 @@ server<-function(input,output,session) {
    if(nzchar(t$choices[[k]]$note%||%'')) tags$p(paste('Earlier note:',t$choices[[k]]$note)),textInput(paste0('note_',k),'Optional note',value=d$note%||%''),if(k=='categories') tags$p('OLSD imports append categories. Removing a selection here cannot remove an existing OLSD category; an administrator must remove it in OLSD.'),
    if(k%in%edits()) button('Cancel','cancel_edit',field=k))
  }
+ output$linked_procedures<-renderTable({req(current());d<-current()$linked_procedures;if(is.null(d)) return(NULL);out<-d[,intersect(c('epic_id','name','sections','link_label'),names(d)),drop=FALSE];names(out)<-c('Procedure ID','Epic display name','Lab sections','Link label')[seq_len(ncol(out))];out})
  testpage<-function() {
   t<-current();if(is.null(t)) return(tags$p('Test not found.'))
   open<-unique(c(open_fields(t),edits()));saved<-setdiff(names(t$choices),open);other<-setdiff(names(fields),c(open,saved))
   tagList(button(paste('Back to',origin()),'back'),tags$h1(t$olsd$name),tags$p(paste(t$number,'· OLSD',t$id,'· Epic',t$epic_id)),if(nzchar(t$link_label%||%'')) tags$p(paste('Epic link:',t$link_label)),if(isTRUE(t$shared_procedure)) tags$p('This Epic procedure links to multiple OLSD entries. Review each entry separately; keep specimen-specific OLSD names unless you explicitly choose a replacement.'),tags$p(status(s(),t)),tags$p(paste('OLSD observed:',display_date(t$sources$olsd$at),'· Epic checked:',display_date(t$sources$epic$at))),
    tags$div(class='steps',paste('Compare & edit →',if(ready(t)) 'Approved → Download / confirm' else 'Review & approve → Download / confirm')),
-   if(length(t$blocked)) tags$div(class='blocker',tags$strong(paste('Waiting on the',t$section,'lab mapping.')),tags$p('An administrator must complete this shared mapping before approval.'),button('Request mapping review','request_mapping',t$id),if(actor$role=='admin') button('Open lab mappings','mappings')),
+   if(!is.null(t$linked_procedures)) tags$section(tags$h2('Linked Epic procedures'),tableOutput('linked_procedures'),
+    if(isTRUE(t$source_conflict)) tags$div(class='blocker',tags$strong('Choose which Epic procedure drives this OLSD entry.'),tags$p('The linked procedures have conflicting source values, or the previous assignment is no longer linked. Current OLSD content is preserved; approval is unavailable until an administrator resolves the assignment.')),
+    if(actor$role=='admin') tagList(selectInput('primary_procedure','Procedure that drives updates',choices=c('Select a procedure'='',setNames(t$linked_procedures$epic_id,paste(t$linked_procedures$epic_id,t$linked_procedures$name,sep=' · '))),selected=s()$source_assignments[[t$id]]%||%'',selectize=FALSE),button('Save procedure assignment','assign_procedure',t$id))),
+   if(length(t$blocked)&&!isTRUE(t$source_conflict)) tags$div(class='blocker',tags$strong(paste('Waiting on the',t$section,'lab mapping.')),tags$p('An administrator must complete this shared mapping before approval.'),button('Request mapping review','request_mapping',t$id),if(actor$role=='admin') button('Open lab mappings','mappings')),
    if(length(open)) uiOutput('progress'),
    lapply(open,function(k) field_cards(t,k)),
    if(length(saved)) tags$section(tags$h2(if(status(s(),t)=='Confirmed in OLSD') 'Confirmed in OLSD' else if(ready(t)) 'Approved' else if(can_approve(t)) 'Ready for approval' else 'Your saved choices'),lapply(saved,function(k) tags$div(class='saved',tags$h3(fields[[k]]),tags$div(class='comparison',value_block('In OLSD now',t$olsd[[k]],t$proposed[[k]]),value_block(if(same(t$proposed[[k]],t$olsd[[k]],k)) 'Kept' else 'After import',t$proposed[[k]],t$olsd[[k]])),tags$p(t$choices[[k]]$note),button(if(status(s(),t)=='Confirmed in OLSD') 'Edit' else 'Change','edit',field=k))),
@@ -236,6 +241,12 @@ server<-function(input,output,session) {
   if(a%in%c('withdraw','send_selected')) {ids<-if(a=='withdraw') id else selected();write(function(st) send_back(st,ids,actor));notify('Returned to review. Earlier unconfirmed files are out of date; do not import them.');return()}
   if(a=='accept_snapshot') {capture();if(length(drafts())) fail('Save or discard choices before accepting a snapshot.');require_role(actor,TRUE);req(upload());u<-upload();store$claim(actor,token);snapshot_pin<-paste0(cfg$pin,'-snapshot-',u$reference$hash);if(!pins::pin_exists(board,snapshot_pin)) pin_write_versioned(board,u$rows,snapshot_pin);u$reference$pin<-snapshot_pin;u$reference$version<-pins::pin_meta(board,snapshot_pin)$local$version;write(function(st) apply_olsd(st,u$rows,u$reference,actor),TRUE);upload(NULL);notify('Snapshot accepted. Review affected tests.');return()}
   if(a=='apply_source') {capture();if(length(drafts())) fail('Save or discard choices before applying a source update.');src<-read_epic_pin(board,cfg$source_pin);write(function(st) apply_epic(st,src$rows,src$reference,actor));source_error('');notify('Latest Epic source applied.');return()}
+  if(a=='assign_procedure') {
+   capture();if(length(drafts())) fail('Save or discard choices before changing the procedure assignment.')
+   require_role(actor,TRUE);src<-read_epic_pin(board,cfg$source_pin)
+   write(function(st) assign_procedure(st,id,input$primary_procedure,src$rows,src$reference,actor),TRUE)
+   notify('Procedure assignment saved. Review this entry’s source changes.');return()
+  }
   if(a=='save_mapping') {
    capture();if(length(drafts())) fail('Save or discard choices before changing a shared mapping.');
    require_role(actor,TRUE);section<-trimws(input$section);lab<-trimws(input$public_lab);category<-trimws(input$category)

@@ -16,11 +16,10 @@ read_olsd <- function(path) {
 }
 validate_epic <- function(d) {
  required<-c('id','epic_id','name','sections')
- if(is.data.frame(d)&&all(c('id','epic_id')%in%names(d))) {
-  duplicate<-unique(as.character(d$id[duplicated(d$id)]))
-  if(length(duplicate)) fail(paste('OLSD IDs must be unique; check procedures linked to:',paste(duplicate,collapse=', ')))
- }
- d<-validate_rows(d,c(required,intersect(c('link_label','link_url'),names(d))),'id')
+ columns<-c(required,intersect(c('link_label','link_url'),names(d)))
+ if(!is.data.frame(d)||!all(required%in%names(d))) fail('Missing Epic link columns.')
+ d$.pair<-paste(d$id,d$epic_id,sep=':')
+ d<-validate_rows(d,c(columns,'.pair'),'.pair');d$.pair<-NULL
  if(any(!grepl('^[0-9]+$',d$id))||any(!nzchar(d$epic_id))||any(!nzchar(d$name))) fail('Epic rows require Procedure IDs, numeric OLSD IDs, and names.')
  for(proc in unique(d$epic_id)) {
   rows<-d[d$epic_id==proc,,drop=FALSE]
